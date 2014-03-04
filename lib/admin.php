@@ -97,7 +97,7 @@ class GF_Tooltips_Admin
        	echo '<li class="custom_tooltip_setting field_setting">';
        		echo '<label for="custom_tooltip">';
        		echo __( 'Tooltip Content', 'gravity-tooltips' );
-       		echo '&nbsp;'.gform_tooltip( 'custom_tooltip_tip', 'tooltip', true );
+       		echo '&nbsp;' . gform_tooltip( 'custom_tooltip_tip', 'tooltip', true );
        		echo '</label>';
 
        		echo '<input type="text" class="fieldwidth-3" id="custom_tooltip" size="35" onkeyup="SetFieldProperty(\'customTooltip\', this.value);"/>';
@@ -310,21 +310,15 @@ class GF_Tooltips_Admin
 						echo '</td>';
 					echo '</tr>';
 
-					echo '<tr>';
-						echo '<th scope="row"></th>';
-						echo '<td>';
-							echo '<p>' . __( 'A more detailed explanation about how the location', 'gravity-tooltips' ) . '</p>';
-						echo '</td>';
-					echo '</tr>';
-
-					echo 'http://craigsworks.com/projects/qtip/docs/tutorials/#position';
-
-
 				echo '</tbody></table>';
 
 				echo '<p><input type="submit" class="button-primary" value="'. __( 'Save Changes' ) . '" /></p>';
 
 			echo '</form>';
+
+			echo '<p>';
+				echo sprintf( __( 'A more detailed explanation about how the tooltip placement and location can be found <a href="%s" target="_blank">here</a>.', 'gravity-tooltips' ), 'http://craigsworks.com/projects/qtip/docs/tutorials/#position' );
+			echo '</p>';
 
 			echo self::settings_close();
 
