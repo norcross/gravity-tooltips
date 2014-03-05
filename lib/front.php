@@ -220,7 +220,7 @@ class GF_Tooltips_Front
 	 */
 	public function scripts_styles( $form, $is_ajax ) {
 
-		wp_enqueue_style( 'gf-tooltips', plugins_url('/css/gf-tooltips.css', __FILE__), array(), GFT_VER, 'all' );
+		wp_enqueue_style( 'gf-tooltips', plugins_url('/css/gf.tooltips.front.css', __FILE__), array(), GFT_VER, 'all' );
 
 		if( SCRIPT_DEBUG ) :
 		// load non-minified version and debug script with cache breaking timestamp if set
@@ -233,7 +233,7 @@ class GF_Tooltips_Front
 
 		endif;
 		// now load our scripts and localize
-		wp_enqueue_script( 'gf-tooltips', plugins_url( '/js/gf-tooltips.js', __FILE__), array( 'jquery' ), GFT_VER, true );
+		wp_enqueue_script( 'gf-tooltips', plugins_url( '/js/gf.tooltips.front.js', __FILE__), array( 'jquery' ), GFT_VER, true );
 		// set up variables for later use
 		wp_localize_script( 'gf-tooltips', 'ttVars', array(
 			'target'		=> self::get_tooltip_data( 'target', 'topRight' ),
