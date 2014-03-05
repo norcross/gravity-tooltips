@@ -69,6 +69,119 @@ class GF_Tooltips
 
 	}
 
+	/**
+	 * [show_field_item_types description]
+	 * @return [type] [description]
+	 */
+	static function show_field_item_types() {
+
+		$defaults	= array(
+			'text',
+			'creditcard',
+			'website',
+			'phone',
+			'number',
+			'date',
+			'time',
+			'textarea',
+			'select',
+			'multiselect',
+			'checkbox',
+			'radio',
+			'name',
+			'address',
+			'fileupload',
+			'email',
+			'post_title',
+			'post_content',
+			'post_excerpt',
+			'post_tags',
+			'post_category',
+			'post_image',
+			'captcha',
+			'product',
+			'singleproduct',
+			'calculation',
+			'price',
+			'hiddenproduct',
+			'list',
+			'shipping',
+			'singleshipping',
+			'option',
+			'quantity',
+			'donation',
+			'total',
+			'post_custom_field',
+			'password'
+		);
+
+		$defaults	= apply_filters( 'gf_tooltips_allowed_fields', $defaults );
+
+		return $defaults;
+
+	}
+
+	/**
+	 * [get_qtip_placement description]
+	 * @param  [type] $current [description]
+	 * @return [type]         [description]
+	 */
+	static function get_qtip_placement( $current ) {
+
+		$options	= array(
+			'topLeft'		=> __( 'Top Left', 'gravity-tooltips' ),
+			'topMiddle'		=> __( 'Top Middle', 'gravity-tooltips' ),
+			'topRight'		=> __( 'Top Right', 'gravity-tooltips' ),
+			'rightTop'		=> __( 'Right Top', 'gravity-tooltips' ),
+			'rightMiddle'	=> __( 'Right Middle', 'gravity-tooltips' ),
+			'rightBottom'	=> __( 'Right Bottom', 'gravity-tooltips' ),
+			'bottomRight'	=> __( 'Bottom Right', 'gravity-tooltips' ),
+			'bottomMiddle'	=> __( 'Bottom Middle', 'gravity-tooltips' ),
+			'bottomLeft'	=> __( 'Bottom Left', 'gravity-tooltips' ),
+			'leftBottom'	=> __( 'Left Bottom', 'gravity-tooltips' ),
+			'leftMiddle'	=> __( 'Left Middle', 'gravity-tooltips' ),
+			'leftTop'		=> __( 'Left Top', 'gravity-tooltips' )
+		);
+
+		$dropdown	= '';
+
+		foreach ( $options as $key => $label ) :
+
+			$dropdown	.= '<option value="' . $key . '"' . selected( $current, $key, false ) . '>' . $label . '</option>';
+
+		endforeach;
+
+		return $dropdown;
+
+	}
+
+	/**
+	 * [get_qtip_designs description]
+	 * @param  [type] $current [description]
+	 * @return [type]         [description]
+	 */
+	static function get_qtip_designs( $current ) {
+
+		$options	= array(
+			'cream'		=> __( 'Cream', 'gravity-tooltips' ),
+			'dark'		=> __( 'Dark', 'gravity-tooltips' ),
+			'green'		=> __( 'Green', 'gravity-tooltips' ),
+			'light'		=> __( 'Light', 'gravity-tooltips' ),
+			'red'		=> __( 'Red', 'gravity-tooltips' ),
+			'blue'		=> __( 'Blue', 'gravity-tooltips' )
+		);
+
+		$dropdown	= '';
+
+		foreach ( $options as $key => $label ) :
+
+			$dropdown	.= '<option value="' . $key . '"' . selected( $current, $key, false ) . '>' . $label . '</option>';
+
+		endforeach;
+
+		return $dropdown;
+
+	}
 
 /// end class
 }
