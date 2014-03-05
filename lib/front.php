@@ -67,6 +67,10 @@ class GF_Tooltips_Front
 		if ( isset ( $data['style'] ) && $data['style'] == 'icon' )
 			$classes .= ' gf-tooltip gf-tooltip-icon';
 
+		// add class for icon tooltip
+		if ( isset ( $data['style'] ) && $data['style'] == 'single' )
+			$classes .= ' gf-tooltip gf-tooltip-single';
+
 		return $classes;
 	}
 
@@ -106,6 +110,10 @@ class GF_Tooltips_Front
    		if ( $style == 'icon' )
    			$content	= self::render_tooltip_icon( $content, $tooltip );
 
+   		// build out single version
+   		if ( $style == 'single' )
+   			$content	= self::render_tooltip_single( $content, $tooltip );
+
 		// return field content with new tooltip
 		return $content;
 
@@ -139,6 +147,26 @@ class GF_Tooltips_Front
 
 		// drop our tooltip on there
 		$content	= str_replace( '</label>', $icon.'</label>', $content );
+
+		// send it back
+		return $content;
+
+	}
+
+	/**
+	 * [render_tooltip_single description]
+	 * @param  [type] $content [description]
+	 * @param  [type] $tooltip [description]
+	 * @return [type]          [description]
+	 */
+	static function render_tooltip_single( $content, $tooltip ) {
+
+		$img	= self::get_tooltip_icon_img( false );
+
+		$icon	= '<span class="gf-tooltip-icon-wrap"><img src="'.esc_url( $img ).'" class="gf-tooltip-icon-img" data-tooltip="' . $tooltip . '"></span>';
+
+		// drop our tooltip on there
+		$content	= str_replace( '</div>', '</div>'.$icon, $content );
 
 		// send it back
 		return $content;

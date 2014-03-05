@@ -278,6 +278,11 @@ class GF_Tooltips_Admin
 							echo '<label for="gf-style-icon">' . __( 'Insert tooltip icon next to label', 'gravity-tooltips' ) . '</label>';
 							echo '</p>';
 
+							echo '<p>';
+							echo '<input id="gf-style-single" class="gf-tooltip-style" type="radio" name="gf-tooltips[style]" value="single" ' . checked( $style, 'single', false ) . ' />';
+							echo '<label for="gf-style-single">' . __( 'Insert tooltip underneath input field.', 'gravity-tooltips' ) . '</label>';
+							echo '</p>';
+
 						echo '</td>';
 					echo '</tr>';
 
