@@ -4,11 +4,11 @@ Plugin Name: Gravity Forms Tooltips
 Plugin URI: http://andrewnorcross.com/plugins/gravity-tooltips/
 Description: Convert the Gravity Forms description field into tooltips
 Author: Andrew Norcross
-Version: 1.0
-Requires at least: 3.0
+Version: 1.0.1
+Requires at least: 3.8
 Author URI: http://andrewnorcross.com
 */
-/*  Copyright 2012 Andrew Norcross
+/*  Copyright 2014 Andrew Norcross
 
 	This program is free software; you can redistribute it and/or modify
 	it under the terms of the GNU General Public License as published by
@@ -25,11 +25,13 @@ Author URI: http://andrewnorcross.com
 */
 
 
-if( ! defined( 'GFT_BASE' ) )
+if( ! defined( 'GFT_BASE' ) ) {
 	define( 'GFT_BASE', plugin_basename(__FILE__) );
+}
 
-if( ! defined( 'GFT_VER' ) )
-	define( 'GFT_VER', '1.0' );
+if( ! defined( 'GFT_VER' ) ) {
+	define( 'GFT_VER', '1.0.1' );
+}
 
 class GF_Tooltips
 {
@@ -182,6 +184,49 @@ class GF_Tooltips
 		return $dropdown;
 
 	}
+
+	/**
+	 * [get_tooltip_icon_img description]
+	 * @return [type] [description]
+	 */
+	static function get_tooltip_icon_img() {
+
+		// set the default with a filter
+		$icon	= apply_filters( 'gf_tooltips_icon_img', plugins_url( 'lib/img/tooltip-icon.png', __FILE__) );
+
+		// return without markup i.e. the URL of the icon
+		return esc_url( $icon );
+
+	}
+
+	/**
+	 * do a string replace on the first instance only
+	 * @param  [type]  $search  [description]
+	 * @param  [type]  $replace [description]
+	 * @param  [type]  $string  [description]
+	 * @param  integer $limit   [description]
+	 * @return [type]           [description]
+	 */
+	static function str_replace_limit( $search, $replace, $string, $limit = 1 ) {
+
+		if ( is_bool( $pos = ( strpos( $string, $search ) ) ) ) {
+			return $string;
+		}
+
+		$length	= strlen( $search );
+
+		for ( $i = 0; $i < $limit; $i++ ) {
+
+			$string = substr_replace( $string, $replace, $pos, $length );
+
+			if ( is_bool( $pos = ( strpos( $string, $search ) ) ) ) {
+				break;
+			}
+		}
+
+		return $string;
+	}
+
 
 /// end class
 }

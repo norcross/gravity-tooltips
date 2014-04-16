@@ -1,0 +1,29 @@
+ul.gform_fields li.gf-tooltip-label label:hover {
+	cursor: help;
+}
+
+ul.gform_fields li.gf-tooltip-single img.gf-tooltip-icon-img,
+ul.gform_fields li.gf-tooltip-icon img.gf-tooltip-icon-img {
+	height: 16px;
+	width: 16px;
+	text-decoration: none;
+	cursor: help;
+	zoom: 1;
+	filter: alpha(opacity=65);
+	opacity: 0.65;
+	-webkit-transition: all 0.5s ease-in-out;
+	-moz-transition: all 0.5s ease-in-out;
+	-ms-transition: all 0.5s ease-in-out;
+	-o-transition: all 0.5s ease-in-out;
+	transition: all 0.5s ease-in-out;
+}
+
+ul.gform_fields li.gf-tooltip-icon img.gf-tooltip-icon-img {
+	margin: 0 0 0 5px;
+}
+
+ul.gform_fields li.gf-tooltip-single img.gf-tooltip-icon-img:hover,
+ul.gform_fields li.gf-tooltip-icon img.gf-tooltip-icon-img:hover {
+	filter: alpha(opacity=100);
+	opacity: 1;
+}

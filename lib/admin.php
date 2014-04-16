@@ -73,10 +73,11 @@ class GF_Tooltips_Admin
 	 */
 	public function scripts_styles( $hook ) {
 
-		if( ! RGForms::is_gravity_page() )
+		if( ! RGForms::is_gravity_page() ) {
 			return;
+		}
 
-		wp_enqueue_script( 'gftips-admin', plugins_url( '/js/gf.tooltips.admin.js', __FILE__ ),	array( 'jquery' ),	GFT_VER, true );
+		wp_enqueue_script( 'gftips-admin', plugins_url( '/js/gftips.admin.js', __FILE__ ),	array( 'jquery' ),	GFT_VER, true );
 		wp_localize_script( 'gftips-admin', 'gftipsAdmin', array(
 			'fieldtypes'	=> GF_Tooltips::show_field_item_types()
 			)

@@ -26,11 +26,13 @@ class GF_Tooltips_Front
 
 		$data	= get_option( 'gf-tooltips' );
 
-		if ( ! $data )
+		if ( ! $data ) {
 			return false;
+		}
 
-		if ( ! $key )
+		if ( ! $key ) {
 			return $data;
+		}
 
 		// check settings and return choice or default
 		$item	= isset( $data[ $key ] ) && ! empty( $data[ $key ] ) ? $data[ $key ] : $default;
@@ -52,24 +54,29 @@ class GF_Tooltips_Front
 		$data	= get_option( 'gf-tooltips' );
 
 		// bail if we have nothing
-		if ( ! $data )
+		if ( ! $data ) {
 			return $classes;
+		}
 
  		// bail if no tooltip actually exists
- 		if ( ! isset( $field['customTooltip'] ) || isset( $field['customTooltip'] ) && empty( $field['customTooltip'] ) )
+ 		if ( ! isset( $field['customTooltip'] ) || isset( $field['customTooltip'] ) && empty( $field['customTooltip'] ) ) {
 			return $classes;
+ 		}
 
 		// add class for label tooltip
-		if ( isset ( $data['style'] ) && $data['style'] == 'label' )
+		if ( isset ( $data['style'] ) && $data['style'] == 'label' ) {
 			$classes .= ' gf-tooltip gf-tooltip-label';
+		}
 
 		// add class for icon tooltip
-		if ( isset ( $data['style'] ) && $data['style'] == 'icon' )
+		if ( isset ( $data['style'] ) && $data['style'] == 'icon' ) {
 			$classes .= ' gf-tooltip gf-tooltip-icon';
+		}
 
 		// add class for icon tooltip
-		if ( isset ( $data['style'] ) && $data['style'] == 'single' )
+		if ( isset ( $data['style'] ) && $data['style'] == 'single' ) {
 			$classes .= ' gf-tooltip gf-tooltip-single';
+		}
 
 		return $classes;
 	}
@@ -85,34 +92,40 @@ class GF_Tooltips_Front
 	public function set_tooltip_display( $content, $field, $value, $lead_id, $form_id ) {
 
 		// this is only for the front end
-		if ( is_admin() )
+		if ( is_admin() ) {
 			return $content;
+		}
 
 		// grab our tooltip style first
  		$style	= self::get_tooltip_data( 'style', 'icon' );
 
  		// bail if we have no position set
- 		if ( ! $style )
+ 		if ( ! $style ) {
  			return $content;
+ 		}
 
  		// bail if no tooltip actually exists
- 		if ( ! isset( $field['customTooltip'] ) || isset( $field['customTooltip'] ) && empty( $field['customTooltip'] ) )
+ 		if ( ! isset( $field['customTooltip'] ) || isset( $field['customTooltip'] ) && empty( $field['customTooltip'] ) ) {
  			return $content;
+ 		}
 
  		// get our content and sanitize it
    		$tooltip	= esc_attr( $field['customTooltip'] );
 
    		// build out label version
-   		if ( $style == 'label' )
+   		if ( $style == 'label' ) {
    			$content	= self::render_tooltip_label( $content, $tooltip );
+   		}
 
    		// build out icon version
-   		if ( $style == 'icon' )
+   		if ( $style == 'icon' ) {
    			$content	= self::render_tooltip_icon( $content, $tooltip );
+   		}
 
    		// build out single version
-   		if ( $style == 'single' )
+   		if ( $style == 'single' ) {
    			$content	= self::render_tooltip_single( $content, $tooltip );
+   		}
 
 		// return field content with new tooltip
 		return $content;
@@ -127,9 +140,7 @@ class GF_Tooltips_Front
 	 */
 	static function render_tooltip_label( $content, $tooltip ) {
 
-		$content	= str_replace( '<label', '<label data-tooltip="' . $tooltip . '"', $content );
-
-		return $content;
+		return GF_Tooltips::str_replace_limit( '<label', '<label data-tooltip="' . $tooltip . '"', $content );
 
 	}
 
@@ -141,15 +152,12 @@ class GF_Tooltips_Front
 	 */
 	static function render_tooltip_icon( $content, $tooltip ) {
 
-		$img	= self::get_tooltip_icon_img( false );
+		$img	= GF_Tooltips::get_tooltip_icon_img( false );
 
 		$icon	= '<img src="'.esc_url( $img ).'" class="gf-tooltip-icon-img" data-tooltip="' . $tooltip . '">';
 
 		// drop our tooltip on there
-		$content	= str_replace( '</label>', $icon.'</label>', $content );
-
-		// send it back
-		return $content;
+		return GF_Tooltips::str_replace_limit( '</label>', $icon . '</label>', $content );
 
 	}
 
@@ -161,29 +169,12 @@ class GF_Tooltips_Front
 	 */
 	static function render_tooltip_single( $content, $tooltip ) {
 
-		$img	= self::get_tooltip_icon_img( false );
+		$img	= GF_Tooltips::get_tooltip_icon_img( false );
 
 		$icon	= '<span class="gf-tooltip-icon-wrap"><img src="'.esc_url( $img ).'" class="gf-tooltip-icon-img" data-tooltip="' . $tooltip . '"></span>';
 
 		// drop our tooltip on there
-		$content	= str_replace( '</div>', '</div>'.$icon, $content );
-
-		// send it back
-		return $content;
-
-	}
-
-	/**
-	 * [get_tooltip_icon_img description]
-	 * @return [type] [description]
-	 */
-	static function get_tooltip_icon_img() {
-
-		// set the default with a filter
-		$icon	= apply_filters( 'gf_tooltips_icon_img', plugins_url( '/img/tooltip-icon.png', __FILE__) );
-
-		// return without markup i.e. the URL of the icon
-		return esc_url( $icon );
+		return GF_Tooltips::str_replace_limit( '</div>', '</div>' . $icon, $content );
 
 	}
 
@@ -206,8 +197,9 @@ class GF_Tooltips_Front
 		);
 
 		// return the whole array
-		if ( ! $option )
+		if ( ! $option ) {
 			return $data;
+		}
 
 		// return the specified option
 		return $data[ $option ];
@@ -220,20 +212,20 @@ class GF_Tooltips_Front
 	 */
 	public function scripts_styles( $form, $is_ajax ) {
 
-		wp_enqueue_style( 'gf-tooltips', plugins_url('/css/gf.tooltips.front.css', __FILE__), array(), GFT_VER, 'all' );
-
-		if( SCRIPT_DEBUG ) :
+		if( defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ) :
 		// load non-minified version and debug script with cache breaking timestamp if set
+			wp_enqueue_style( 'gf-tooltips',	plugins_url( '/css/gftips.front.css',		__FILE__ ), array(),		GFT_VER,	'all'	);
 			wp_enqueue_script( 'qtip-tips',		plugins_url( '/js/jquery.qtip.js',			__FILE__ ),	array( 'jquery' ),	time(),	true	);
 			wp_enqueue_script( 'qtip-debug',	plugins_url( '/js/jquery.qtip.debug.js',	__FILE__ ),	array( 'jquery' ),	time(),	true	);
-
+			wp_enqueue_script( 'gf-tooltips',	plugins_url( '/js/gftips.front.js',			__FILE__ ),	array( 'jquery' ), GFT_VER, true	);
 		else:
  		// load the normal minified
-			wp_enqueue_script( 'qtip-tips-min', plugins_url( '/js/jquery.qtip.min.js',		__FILE__ ),	array( 'jquery' ),	'1.0',	true	);
-
+ 			wp_enqueue_style( 'gf-tooltips',	plugins_url( '/css/gftips.front.min.css',	__FILE__ ), array(),		GFT_VER,	'all'	);
+			wp_enqueue_script( 'qtip-tips',		plugins_url( '/js/jquery.qtip.min.js',		__FILE__ ),	array( 'jquery' ),	'1.0',	true	);
+			wp_enqueue_script( 'gf-tooltips',	plugins_url( '/js/gftips.front.min.js',		__FILE__ ),	array( 'jquery' ), GFT_VER, true	);
 		endif;
-		// now load our scripts and localize
-		wp_enqueue_script( 'gf-tooltips', plugins_url( '/js/gf.tooltips.front.js', __FILE__), array( 'jquery' ), GFT_VER, true );
+
+
 		// set up variables for later use
 		wp_localize_script( 'gf-tooltips', 'ttVars', array(
 			'target'		=> self::get_tooltip_data( 'target', 'topRight' ),
