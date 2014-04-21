@@ -42,10 +42,8 @@ class GF_Tooltips
 	 * @return GF_Tooltips
 	 */
 	public function __construct() {
-		// back end general
 		add_action			(	'plugins_loaded',						array(	$this,	'textdomain'			)			);
 		add_action			(	'plugins_loaded',						array(	$this,	'load_files'			)			);
-
 	}
 
 	/**
