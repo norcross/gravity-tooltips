@@ -2,7 +2,7 @@
 /*
 Plugin Name: Gravity Forms Tooltips
 Plugin URI: http://andrewnorcross.com/plugins/gravity-tooltips/
-Description: Convert the Gravity Forms description field into tooltips
+Description: Add custom tooltips in Gravity Forms.
 Author: Andrew Norcross
 Version: 1.0.1
 Requires at least: 3.8
