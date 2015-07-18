@@ -1,93 +1,84 @@
 <?php
+/**
+ * Gravity Tooltips - Front Module
+ *
+ * Contains front end related functions
+ *
+ * @package Gravity Forms Tooltips
+ */
+/*  Copyright 2013 Reaktiv Studios
 
+	This program is free software; you can redistribute it and/or modify
+	it under the terms of the GNU General Public License as published by
+	the Free Software Foundation; version 2 of the License (GPL v2) only.
+
+	This program is distributed in the hope that it will be useful,
+	but WITHOUT ANY WARRANTY; without even the implied warranty of
+	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+	GNU General Public License for more details.
+
+	You should have received a copy of the GNU General Public License
+	along with this program; if not, write to the Free Software
+	Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+*/
+
+if ( ! class_exists( 'GF_Tooltips_Front' ) ) {
+
+// Start up the engine
 class GF_Tooltips_Front
 {
 
 	/**
-	 * This is our constructor
+	 * fire it up
 	 *
-	 * @return GF_Tooltips
 	 */
-	public function __construct() {
+	public function init() {
 
-		// GF specific
-		add_action			(	'gform_enqueue_scripts',				array(	$this,	'scripts_styles'		),	10,	2	);
-		add_action			(	'gform_field_css_class',				array(	$this,	'set_tooltip_class'		),	10,	3	);
-		add_filter			(	'gform_field_content',					array(	$this,	'set_tooltip_display'	),	10,	5	);
+		// bail on admin
+		if ( is_admin() ) {
+			return;
+		}
 
+		add_action( 'gform_enqueue_scripts',                array( $this, 'scripts_styles'              ),  10, 2   );
+		add_action( 'gform_field_css_class',                array( $this, 'set_tooltip_class'           ),  10, 3   );
+		add_filter( 'gform_field_content',                  array( $this, 'set_tooltip_display'         ),  10, 5   );
 	}
 
 	/**
-	 * [get_tooltip_data description]
-	 * @param  boolean $key [description]
-	 * @return [type]       [description]
-	 */
-	static function get_tooltip_data( $key = false, $default = '' ) {
-
-		$data	= get_option( 'gf-tooltips' );
-
-		if ( ! $data ) {
-			return false;
-		}
-
-		if ( ! $key ) {
-			return $data;
-		}
-
-		// check settings and return choice or default
-		$item	= isset( $data[ $key ] ) && ! empty( $data[ $key ] ) ? $data[ $key ] : $default;
-
-		return $item;
-
-	}
-
-	/**
-	 * [set_field_class description]
+	 * set a CSS class on the item
+	 *
 	 * @param [type] $classes [description]
 	 * @param [type] $field   [description]
 	 * @param [type] $form    [description]
+	 *
+	 * @return [type]          [description]
 	 */
-
 	public function set_tooltip_class( $classes, $field, $form ){
 
-		// grab option field
-		$data	= get_option( 'gf-tooltips' );
-
-		// bail if we have nothing
-		if ( ! $data ) {
+		// bail if no tooltip actually exists
+		if ( empty( $field['customTooltip'] ) ) {
 			return $classes;
 		}
 
- 		// bail if no tooltip actually exists
- 		if ( ! isset( $field['customTooltip'] ) || isset( $field['customTooltip'] ) && empty( $field['customTooltip'] ) ) {
-			return $classes;
- 		}
-
-		// add class for label tooltip
-		if ( isset ( $data['style'] ) && $data['style'] == 'label' ) {
-			$classes .= ' gf-tooltip gf-tooltip-label';
+		// get our setting and add our class
+		if ( false !== $type = GF_Tooltips_Helper::get_tooltip_data( 'type', 'icon' ) ) {
+			$classes .= ' gf-tooltip gf-tooltip-' . esc_attr( $type );
 		}
 
-		// add class for icon tooltip
-		if ( isset ( $data['style'] ) && $data['style'] == 'icon' ) {
-			$classes .= ' gf-tooltip gf-tooltip-icon';
-		}
-
-		// add class for icon tooltip
-		if ( isset ( $data['style'] ) && $data['style'] == 'single' ) {
-			$classes .= ' gf-tooltip gf-tooltip-single';
-		}
-
+		// return the classes
 		return $classes;
 	}
 
 	/**
-	 * [set_tooltip_display description]
+	 * set up the tooltip display
+	 *
 	 * @param [type] $content [description]
 	 * @param [type] $field   [description]
 	 * @param [type] $value   [description]
 	 * @param [type] $lead_id [description]
 	 * @param [type] $form_id [description]
+	 *
+	 * @return [type]          [description]
 	 */
 	public function set_tooltip_display( $content, $field, $value, $lead_id, $form_id ) {
 
@@ -96,150 +87,164 @@ class GF_Tooltips_Front
 			return $content;
 		}
 
-		// grab our tooltip style first
- 		$style	= self::get_tooltip_data( 'style', 'icon' );
-
- 		// bail if we have no position set
- 		if ( ! $style ) {
- 			return $content;
- 		}
-
- 		// bail if no tooltip actually exists
- 		if ( ! isset( $field['customTooltip'] ) || isset( $field['customTooltip'] ) && empty( $field['customTooltip'] ) ) {
- 			return $content;
- 		}
-
- 		// get our content and sanitize it
-   		$tooltip	= esc_attr( $field['customTooltip'] );
-
-   		// build out label version
-   		if ( $style == 'label' ) {
-   			$content	= self::render_tooltip_label( $content, $tooltip );
-   		}
-
-   		// build out icon version
-   		if ( $style == 'icon' ) {
-   			$content	= self::render_tooltip_icon( $content, $tooltip );
-   		}
-
-   		// build out single version
-   		if ( $style == 'single' ) {
-   			$content	= self::render_tooltip_single( $content, $tooltip );
-   		}
-
-		// return field content with new tooltip
-		return $content;
-
-	}
-
-	/**
-	 * filter the existing label markup to add the data attribute
-	 * @param  [type] $content [description]
-	 * @param  [type] $tooltip [description]
-	 * @return [type]          [description]
-	 */
-	static function render_tooltip_label( $content, $tooltip ) {
-
-		return GF_Tooltips::str_replace_limit( '<label', '<label data-tooltip="' . $tooltip . '"', $content );
-
-	}
-
-	/**
-	 * [render_tooltip_icon description]
-	 * @param  [type] $content [description]
-	 * @param  [type] $tooltip [description]
-	 * @return [type]          [description]
-	 */
-	static function render_tooltip_icon( $content, $tooltip ) {
-
-		$img	= GF_Tooltips::get_tooltip_icon_img( false );
-
-		$icon	= '<img src="'.esc_url( $img ).'" class="gf-tooltip-icon-img" data-tooltip="' . $tooltip . '">';
-
-		// drop our tooltip on there
-		return GF_Tooltips::str_replace_limit( '</label>', $icon . '</label>', $content );
-
-	}
-
-	/**
-	 * [render_tooltip_single description]
-	 * @param  [type] $content [description]
-	 * @param  [type] $tooltip [description]
-	 * @return [type]          [description]
-	 */
-	static function render_tooltip_single( $content, $tooltip ) {
-
-		$img	= GF_Tooltips::get_tooltip_icon_img( false );
-
-		$icon	= '<span class="gf-tooltip-icon-wrap"><img src="'.esc_url( $img ).'" class="gf-tooltip-icon-img" data-tooltip="' . $tooltip . '"></span>';
-
-		// drop our tooltip on there
-		return GF_Tooltips::str_replace_limit( '</div>', '</div>' . $icon, $content );
-
-	}
-
-	/**
-	 * [get_tooltip_customs description]
-	 * @param  boolean $option [description]
-	 * @return [type]          [description]
-	 */
-	static function get_tooltip_customs( $option = false ) {
-
-		$showdelay	= apply_filters( 'gf_tooltips_show_delay', 700 );
-		$showsolo	= apply_filters( 'gf_tooltips_show_solo', true );
-
-		$hidedelay	= apply_filters( 'gf_tooltips_hide_delay', 300 );
-
-		$data	= array(
-			'showdelay'	=> (int) $showdelay,
-			'showsolo'	=> (bool) $showsolo,
-			'hidedelay'	=> (int) $hidedelay,
-		);
-
-		// return the whole array
-		if ( ! $option ) {
-			return $data;
+		// bail if no tooltip actually exists
+		if ( empty( $field['customTooltip'] ) ) {
+			return $content;
 		}
 
-		// return the specified option
-		return $data[ $option ];
+		// grab our tooltip type first (and bail without)
+		if ( false === $type = GF_Tooltips_Helper::get_tooltip_data( 'type', 'icon' ) ) {
+			return $content;
+		}
 
+		// filter the text
+		if ( false === $text = apply_filters( 'gf_tooltips_text', $field['customTooltip'], $field, $form_id ) ) {
+			return $content;
+		}
+
+		// render and return
+		return self::render_tooltip_markup( $field['customTooltip'], $type, $content, $field, $form_id );
 	}
 
 	/**
-	 * [scripts_styles description]
+	 * filter the markup based on the type
+	 *
+	 * @param  string $text    [description]
+	 * @param  string $type    [description]
+	 * @param  string $render  [description]
+	 *
+	 * @return [type]          [description]
+	 */
+	public static function render_tooltip_markup( $text = '', $type = '', $render = '', $field, $form_id ) {
+
+		// grab our tooltip design and target
+		$design = GF_Tooltips_Helper::get_tooltip_data( 'design', 'light' );
+		$target = GF_Tooltips_Helper::get_tooltip_data( 'target', 'right' );
+
+		// set a class
+		$class  = self::get_tooltip_class( $design, $target, $type );
+
+		// build out label version
+		if ( $type == 'label' ) {
+
+			// first add the class
+			$render = GF_Tooltips_Helper::str_replace_limit( 'gfield_label', 'gfield_label ' . $class, $render );
+
+			// now add the tooltip
+			$render = GF_Tooltips_Helper::str_replace_limit( '<label', '<label data-hint="' . esc_attr( $text ) . '"', $render );
+		}
+
+		// build out icon version
+		if ( $type == 'icon' ) {
+
+			// get my icon
+			$icon   = self::get_tooltip_icon();
+
+			// build the markup
+			$setup  = '<span class="gf-icon ' . $class . '" data-hint="' . esc_attr( $text ) . '">' . $icon . '</span>';
+
+			// render it
+			$render = GF_Tooltips_Helper::str_replace_limit( '</label>', $setup . '</label>', $render );
+		}
+
+		// build out single version
+		if ( $type == 'single' ) {
+
+			// get my icon
+			$icon   = self::get_tooltip_icon();
+
+			// build the markup
+			$setup  = '<span class="gf-icon ' . $class . '" data-hint="' . esc_attr( $text ) . '">' . $icon . '</span>';
+
+			// render it
+			$render = GF_Tooltips_Helper::str_replace_limit( '</div>', '</div>' . $setup, $render );
+		}
+
+		// return field content with new tooltip
+		return apply_filters( 'gf_tooltips_filter_display', $render, $type, $field, $form_id );
+	}
+
+	/**
+	 * load our CSS files
+	 *
 	 * @return [type] [description]
 	 */
 	public function scripts_styles( $form, $is_ajax ) {
 
-		if( defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ) :
-		// load non-minified version and debug script with cache breaking timestamp if set
-			wp_enqueue_style( 'gf-tooltips',	plugins_url( '/css/gftips.front.css',		__FILE__ ), array(),		GFT_VER,	'all'	);
-			wp_enqueue_script( 'qtip-tips',		plugins_url( '/js/jquery.qtip.js',			__FILE__ ),	array( 'jquery' ),	time(),	true	);
-			wp_enqueue_script( 'qtip-debug',	plugins_url( '/js/jquery.qtip.debug.js',	__FILE__ ),	array( 'jquery' ),	time(),	true	);
-			wp_enqueue_script( 'gf-tooltips',	plugins_url( '/js/gftips.front.js',			__FILE__ ),	array( 'jquery' ), GFT_VER, true	);
-		else:
- 		// load the normal minified
- 			wp_enqueue_style( 'gf-tooltips',	plugins_url( '/css/gftips.front.min.css',	__FILE__ ), array(),		GFT_VER,	'all'	);
-			wp_enqueue_script( 'qtip-tips',		plugins_url( '/js/jquery.qtip.min.js',		__FILE__ ),	array( 'jquery' ),	'1.0',	true	);
-			wp_enqueue_script( 'gf-tooltips',	plugins_url( '/js/gftips.front.min.js',		__FILE__ ),	array( 'jquery' ), GFT_VER, true	);
-		endif;
+		// make sure we want fontawesome
+		if ( false !== $fontawesome = apply_filters( 'gf_tooltips_use_fontawesome', true ) ) {
+			wp_enqueue_style( 'fontawesome', '//maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css', array(), '4.3.0', 'all' );
+		}
 
+		// set our filename based on debug
+		$file   = defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ? 'hint.css' : 'hint.min.css';
 
-		// set up variables for later use
-		wp_localize_script( 'gf-tooltips', 'ttVars', array(
-			'target'		=> self::get_tooltip_data( 'target', 'topRight' ),
-			'location'		=> self::get_tooltip_data( 'location', 'bottomLeft' ),
-			'design'		=> self::get_tooltip_data( 'design', 'light' ),
-			'showdelay'		=> self::get_tooltip_customs( 'showdelay' ),
-			'showsolo'		=> self::get_tooltip_customs( 'showsolo' ),
-			'hidedelay'		=> self::get_tooltip_customs( 'hidedelay' ),
-			)
-		);
-
+		// and the actual hint class
+		wp_enqueue_style( 'gf-tooltips', plugins_url( '/css/' . $file, __FILE__ ), array(), '1.3.5', 'all' );
 	}
 
-/// end class
+	/**
+	 * generate and return the CSS class
+	 *
+	 * @param  string $design [description]
+	 * @param  string $target [description]
+	 * @param  string $type   [description]
+	 *
+	 * @return [type]         [description]
+	 */
+	public static function get_tooltip_class( $design = '', $target = '', $type = '' ) {
+
+		// set an empty
+		$class  = '';
+
+		// set the base class
+		$class .= 'hint--' . esc_attr( $design ) . ' hint--' . esc_attr( $target );
+
+		// check for bounce
+		if ( false !== $bounce = apply_filters( 'gf_tooltips_bounce', true ) ) {
+			$class .= ' hint--bounce';
+		}
+
+		// check for rounded
+		if ( false !== $rounded = apply_filters( 'gf_tooltips_rounded', true ) ) {
+			$class .= ' hint--rounded';
+		}
+
+		// check for no animation (bounce can't also be used)
+		if ( false !== $animate = apply_filters( 'gf_tooltips_no_animated', false ) ) {
+			$class .= ' hint--no-animate';
+		}
+
+		// check for static
+		if ( false !== $static = apply_filters( 'gf_tooltips_static', false ) ) {
+			$class .= ' hint--always';
+		}
+
+		// return it filtered
+		return apply_filters( 'gf_tooltips_class', $class, $design, $target, $type );
+	}
+
+	/**
+	 * set the default with a filter and return
+	 *
+	 * @return [type] [description]
+	 */
+	public static function get_tooltip_icon() {
+
+		// set the icon class
+		$class  = apply_filters( 'gf_tooltips_icon_class', 'fa fa-question-circle' );
+
+		// return it
+		return apply_filters( 'gf_tooltips_icon', '<i class="' . esc_attr( $class ) . '"></i>' );
+	}
+
+
+// end class
 }
 
-new GF_Tooltips_Front();
+// end exists check
+}
+
+// Instantiate our class
+$GF_Tooltips_Front = new GF_Tooltips_Front();
+$GF_Tooltips_Front->init();

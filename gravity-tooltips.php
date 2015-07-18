@@ -4,7 +4,7 @@ Plugin Name: Gravity Forms Tooltips
 Plugin URI: http://andrewnorcross.com/plugins/gravity-tooltips/
 Description: Add custom tooltips in Gravity Forms.
 Author: Andrew Norcross
-Version: 1.0.1
+Version: 2.0.0
 Requires at least: 3.8
 Author URI: http://andrewnorcross.com
 */
@@ -30,20 +30,46 @@ if( ! defined( 'GFT_BASE' ) ) {
 }
 
 if( ! defined( 'GFT_VER' ) ) {
-	define( 'GFT_VER', '1.0.1' );
+	define( 'GFT_VER', '2.0.0' );
 }
 
 class GF_Tooltips
 {
 
 	/**
+	 * Static property to hold our singleton instance
+	 * @var instance
+	 */
+	static $instance = false;
+
+	/**
 	 * This is our constructor
 	 *
 	 * @return GF_Tooltips
 	 */
-	public function __construct() {
-		add_action			(	'plugins_loaded',						array(	$this,	'textdomain'			)			);
-		add_action			(	'plugins_loaded',						array(	$this,	'load_files'			)			);
+	private function __construct() {
+		add_action(	'plugins_loaded',						array( $this, 'textdomain'			)			);
+		add_action(	'plugins_loaded',						array( $this, 'load_files'			)			);
+
+		// activation hooks
+		register_activation_hook( __FILE__,                 array( $this, 'set_options'         )           );
+	}
+
+	/**
+	 * If an instance exists, this returns it.  If not, it creates one and
+	 * retuns it.
+	 *
+	 * @return
+	 */
+	public static function getInstance() {
+
+		// check for an instance of the class before loading
+		if ( ! self::$instance ) {
+			self::$instance = new self;
+		}
+
+		// return the instance
+		return self::$instance;
 	}
 
 	/**
@@ -51,182 +77,58 @@ class GF_Tooltips
 	 *
 	 * @return string load_plugin_textdomain
 	 */
-
 	public function textdomain() {
-
 		load_plugin_textdomain( 'gravity-tooltips', false, dirname( plugin_basename( __FILE__ ) ) . '/languages/' );
-
 	}
 
 	/**
-	 * [load_files description]
+	 * load our files
+	 *
 	 * @return [type] [description]
 	 */
 	public function load_files() {
 
-		require_once( 'lib/admin.php' );
-		require_once( 'lib/front.php' );
-
-	}
-
-	/**
-	 * [show_field_item_types description]
-	 * @return [type] [description]
-	 */
-	static function show_field_item_types() {
-
-		$defaults	= array(
-			'text',
-			'creditcard',
-			'website',
-			'phone',
-			'number',
-			'date',
-			'time',
-			'textarea',
-			'select',
-			'multiselect',
-			'checkbox',
-			'radio',
-			'name',
-			'address',
-			'fileupload',
-			'email',
-			'post_title',
-			'post_content',
-			'post_excerpt',
-			'post_tags',
-			'post_category',
-			'post_image',
-			'captcha',
-			'product',
-			'singleproduct',
-			'calculation',
-			'price',
-			'hiddenproduct',
-			'list',
-			'shipping',
-			'singleshipping',
-			'option',
-			'quantity',
-			'donation',
-			'total',
-			'post_custom_field',
-			'password'
-		);
-
-		$defaults	= apply_filters( 'gf_tooltips_allowed_fields', $defaults );
-
-		return $defaults;
-
-	}
-
-	/**
-	 * [get_qtip_placement description]
-	 * @param  [type] $current [description]
-	 * @return [type]         [description]
-	 */
-	static function get_qtip_placement( $current ) {
-
-		$options	= array(
-			'topLeft'		=> __( 'Top Left', 'gravity-tooltips' ),
-			'topMiddle'		=> __( 'Top Middle', 'gravity-tooltips' ),
-			'topRight'		=> __( 'Top Right', 'gravity-tooltips' ),
-			'rightTop'		=> __( 'Right Top', 'gravity-tooltips' ),
-			'rightMiddle'	=> __( 'Right Middle', 'gravity-tooltips' ),
-			'rightBottom'	=> __( 'Right Bottom', 'gravity-tooltips' ),
-			'bottomRight'	=> __( 'Bottom Right', 'gravity-tooltips' ),
-			'bottomMiddle'	=> __( 'Bottom Middle', 'gravity-tooltips' ),
-			'bottomLeft'	=> __( 'Bottom Left', 'gravity-tooltips' ),
-			'leftBottom'	=> __( 'Left Bottom', 'gravity-tooltips' ),
-			'leftMiddle'	=> __( 'Left Middle', 'gravity-tooltips' ),
-			'leftTop'		=> __( 'Left Top', 'gravity-tooltips' )
-		);
-
-		$dropdown	= '';
-
-		foreach ( $options as $key => $label ) :
-
-			$dropdown	.= '<option value="' . $key . '"' . selected( $current, $key, false ) . '>' . $label . '</option>';
-
-		endforeach;
-
-		return $dropdown;
-
-	}
-
-	/**
-	 * [get_qtip_designs description]
-	 * @param  [type] $current [description]
-	 * @return [type]         [description]
-	 */
-	static function get_qtip_designs( $current ) {
-
-		$options	= array(
-			'cream'		=> __( 'Cream', 'gravity-tooltips' ),
-			'dark'		=> __( 'Dark', 'gravity-tooltips' ),
-			'green'		=> __( 'Green', 'gravity-tooltips' ),
-			'light'		=> __( 'Light', 'gravity-tooltips' ),
-			'red'		=> __( 'Red', 'gravity-tooltips' ),
-			'blue'		=> __( 'Blue', 'gravity-tooltips' )
-		);
-
-		$dropdown	= '';
-
-		foreach ( $options as $key => $label ) :
-
-			$dropdown	.= '<option value="' . $key . '"' . selected( $current, $key, false ) . '>' . $label . '</option>';
-
-		endforeach;
-
-		return $dropdown;
-
-	}
-
-	/**
-	 * [get_tooltip_icon_img description]
-	 * @return [type] [description]
-	 */
-	static function get_tooltip_icon_img() {
-
-		// set the default with a filter
-		$icon	= apply_filters( 'gf_tooltips_icon_img', plugins_url( 'lib/img/tooltip-icon.png', __FILE__) );
-
-		// return without markup i.e. the URL of the icon
-		return esc_url( $icon );
-
-	}
-
-	/**
-	 * do a string replace on the first instance only
-	 * @param  [type]  $search  [description]
-	 * @param  [type]  $replace [description]
-	 * @param  [type]  $string  [description]
-	 * @param  integer $limit   [description]
-	 * @return [type]           [description]
-	 */
-	static function str_replace_limit( $search, $replace, $string, $limit = 1 ) {
-
-		if ( is_bool( $pos = ( strpos( $string, $search ) ) ) ) {
-			return $string;
+		// load our admin setup
+		if ( is_admin() ) {
+			require_once( 'lib/admin.php' );
 		}
 
-		$length	= strlen( $search );
-
-		for ( $i = 0; $i < $limit; $i++ ) {
-
-			$string = substr_replace( $string, $replace, $pos, $length );
-
-			if ( is_bool( $pos = ( strpos( $string, $search ) ) ) ) {
-				break;
-			}
+		// load our front end setup
+		if ( ! is_admin() ) {
+			require_once( 'lib/front.php' );
 		}
 
-		return $string;
+		// load our helper
+		require_once( 'lib/helper.php' );
 	}
 
+	/**
+	 * set our options if
+	 */
+	public function set_options() {
+
+		// check for data first
+		$exist  = get_option( 'gf-tooltips' );
+
+		// we have it. leave it alone
+		if ( ! empty( $exist ) ) {
+			return;
+		}
+
+		// set a data array
+		$data   = array(
+			'type'      => 'icon',
+			'design'    => 'light',
+			'target'    => 'right',
+		);
+
+		// add the option
+		update_option( 'gf-tooltips', $data, 'no' );
+	}
 
 /// end class
 }
 
-new GF_Tooltips();
+// Instantiate our class
+$GF_Tooltips = GF_Tooltips::getInstance();
+

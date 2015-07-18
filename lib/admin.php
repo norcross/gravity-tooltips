@@ -1,95 +1,147 @@
 <?php
+/**
+ * Gravity Tooltips - Admin Module
+ *
+ * Contains admin related functions
+ *
+ * @package Gravity Forms Tooltips
+ */
+/*  Copyright 2013 Reaktiv Studios
 
+	This program is free software; you can redistribute it and/or modify
+	it under the terms of the GNU General Public License as published by
+	the Free Software Foundation; version 2 of the License (GPL v2) only.
+
+	This program is distributed in the hope that it will be useful,
+	but WITHOUT ANY WARRANTY; without even the implied warranty of
+	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+	GNU General Public License for more details.
+
+	You should have received a copy of the GNU General Public License
+	along with this program; if not, write to the Free Software
+	Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+*/
+
+if ( ! class_exists( 'GF_Tooltips_Admin' ) ) {
+
+// Start up the engine
 class GF_Tooltips_Admin
 {
 
 	/**
-	 * This is our constructor
+	 * fire it up
 	 *
-	 * @return GF_Tooltips
 	 */
-	public function __construct() {
-		add_action			(	'admin_enqueue_scripts',				array(	$this,	'scripts_styles'			),	10		);
-		add_action			(	'admin_init',							array(	$this,	'reg_settings'				)			);
-		add_action			(	'admin_notices',						array(	$this,	'active_check'				),	10		);
-		add_action			(	'admin_notices',						array(	$this,	'settings_saved'			),	10		);
+	public function init() {
 
-		add_filter			(	'plugin_action_links',					array(	$this,	'quick_link'				),	10,	2	);
+		// bail on non admin
+		if ( ! is_admin() ) {
+			return;
+		}
+
+		add_action( 'admin_enqueue_scripts',                array( $this, 'scripts_styles'              ),  10      );
+		add_action( 'admin_init',                           array( $this, 'reg_settings'                )           );
+		add_action( 'admin_notices',                        array( $this, 'active_check'                ),  10      );
+		add_action( 'admin_notices',                        array( $this, 'settings_saved'              ),  10      );
+
+		add_filter( 'plugin_action_links',                  array( $this, 'quick_link'                  ),  10, 2   );
 
 		// backend GF specifc
-		add_action			(	'gform_field_advanced_settings',		array(	$this,	'add_form_builder_field'	),	10,	2	);
-		add_filter			(	'gform_tooltips',						array(	$this,	'add_form_builder_tooltip'	)			);
-		add_filter			(	'gform_addon_navigation',				array(	$this,	'create_menu'				)			);
-		add_filter			(	'gform_noconflict_scripts',				array(	$this,	'register_admin_script'		)			);
+		add_filter( 'gform_addon_navigation',               array( $this, 'create_menu'                 )           );
+		add_action( 'gform_field_advanced_settings',        array( $this, 'add_form_builder_field'      ),  10, 2   );
+		add_filter( 'gform_tooltips',                       array( $this, 'add_form_builder_tooltip'    )           );
+		add_filter( 'gform_noconflict_scripts',             array( $this, 'register_admin_script'       )           );
 	}
 
+	/**
+	 * load JS for fields
+	 *
+	 * @param  [type] $hook [description]
+	 *
+	 * @return [type]       [description]
+	 */
+	public function scripts_styles( $hook ) {
+
+		// bail if not on the GF page
+		if( ! RGForms::is_gravity_page() ) {
+			return;
+		}
+
+		// load them
+		wp_enqueue_script( 'gftips-admin', plugins_url( '/js/gftips.admin.js', __FILE__ ),  array( 'jquery' ),  GFT_VER, true );
+		wp_localize_script( 'gftips-admin', 'gftipsAdmin',
+			array(
+				'fldTypes' => self::show_field_item_types()
+			)
+		);
+	}
+
+	/**
+	 * register our settings for later
+	 * @return void
+	 */
+	public function reg_settings() {
+		register_setting( 'gf-tooltips', 'gf-tooltips');
+	}
 
 	/**
 	 * check that GF is active before loading
+	 *
 	 * @return void
 	 */
 	public function active_check() {
 
-		$screen = get_current_screen();
-
-		if ( $screen->parent_file !== 'plugins.php' ) {
+		// bail without our function
+		if ( ! function_exists( 'get_current_screen' ) ) {
 			return;
 		}
 
+		// fetch the screen
+		$screen = get_current_screen();
+
+		// bail if we don't match up
+		if ( ! is_object( $screen ) || empty( $screen->parent_file ) || $screen->parent_file !== 'plugins.php' ) {
+			return;
+		}
+
+		// if we don't have our class, show it
 		if ( ! class_exists( 'GFForms' ) ) {
 
-			echo '<div id="message" class="error fade below-h2"><p><strong>'.__( 'This plugin requires Gravity Forms to function.', 'gravity-tooltips' ).'</strong></p></div>';
+			echo '<div id="message" class="error notice is-dismissible fade below-h2"><p><strong>' . __( 'This plugin requires Gravity Forms to function.', 'gravity-tooltips' ) . '</strong></p></div>';
 
 			// hide activation method
 			unset( $_GET['activate'] );
 
 			// deactivate YOURSELF
 			deactivate_plugins( plugin_basename( __FILE__ ) );
-
 		}
 
+		// and just return
 		return;
-
 	}
-
 
 	/**
 	 * register the admin script with Gravity Forms so that it gets enqueued when running on no-conflict mode
+	 *
 	 * @param  [type] $scripts [description]
+	 *
 	 * @return [type]          [description]
 	 */
 	public function register_admin_script( $scripts ){
 
+		// add it
 		$scripts[] = 'gftips-admin';
 
+		// return them
 		return $scripts;
-
-	}
-
-	/**
-	 * load JS for fields
-	 * @param  [type] $hook [description]
-	 * @return [type]       [description]
-	 */
-	public function scripts_styles( $hook ) {
-
-		if( ! RGForms::is_gravity_page() ) {
-			return;
-		}
-
-		wp_enqueue_script( 'gftips-admin', plugins_url( '/js/gftips.admin.js', __FILE__ ),	array( 'jquery' ),	GFT_VER, true );
-		wp_localize_script( 'gftips-admin', 'gftipsAdmin', array(
-			'fieldtypes'	=> GF_Tooltips::show_field_item_types()
-			)
-		);
-
-
 	}
 
 	/**
 	 * show settings link on plugins page
+	 *
 	 * @param  [type] $links [description]
 	 * @param  [type] $file  [description]
+	 *
 	 * @return [type]        [description]
 	 */
 	public function quick_link( $links, $file ) {
@@ -101,44 +153,55 @@ class GF_Tooltips_Admin
 		}
 
 		// check to make sure we are on the correct plugin
-		if ( $file != $this_plugin )
+		if ( $file != $this_plugin ) {
 			return $links;
+		}
 
-		$settings_link  = '<a href="' . menu_page_url( 'gf-tooltips', 0 ).' ">'.__( 'Settings', 'gravity-tooltips' ).'</a>';
+		// make our link
+		$setup  = '<a href="' . menu_page_url( 'gf-tooltips', 0 ) . ' ">' . __( 'Settings', 'gravity-tooltips' ) . '</a>';
 
-		array_unshift( $links, $settings_link );
+		// add it to the array
+		array_unshift( $links, $setup );
 
+		// return it
 		return $links;
-
 	}
 
 	/**
 	 * add tooltip settings to main GF admin menu
+	 *
 	 * @param  [type] $menu_items [description]
+	 *
 	 * @return [type]             [description]
 	 */
 	public function create_menu( $menu_items ) {
 
+		// set up the item
 		$menu_items[] = array(
 			'name'      => 'gf-tooltips',
 			'label'     => __( 'Tooltips', 'gravity-tooltips' ),
-			'callback'  => array( $this, 'settings_page' )
+			'callback'  => array( __class__, 'settings_page' )
 		);
 
+		// return the items
 		return $menu_items;
 	}
 
 	/**
 	 * add the new textfield to the form builder on the advanced tab in GF
+	 *
 	 * @param [type] $position [description]
+	 *
 	 * @param [type] $form_id  [description]
 	 */
 	public function add_form_builder_field( $position, $form_id ) {
 
+		// only run this on our preferred position
 		if ( $position != 50 ) {
 			return;
 		}
 
+		// add the tooltip for the tooltips
 		echo '<li class="custom_tooltip_setting field_setting">';
 			echo '<label for="custom_tooltip">';
 				echo __( 'Tooltip Content', 'gravity-tooltips' );
@@ -148,103 +211,103 @@ class GF_Tooltips_Admin
 			echo '<input type="text" class="fieldwidth-3" id="custom_tooltip" size="35" onkeyup="SetFieldProperty(\'customTooltip\', this.value);"/>';
 
 		echo '</li>';
-
 	}
 
 	/**
 	 * add the tooltip text to the GF form field item
+	 *
 	 * @param [type] $tooltips [description]
 	 */
 	public function add_form_builder_tooltip( $tooltips ) {
 
 		// the title of the tooltip
-		$title	= '<h6>'.__( 'Custom Tooltip', 'gravity-tooltips' ).'</h6>';
+		$title  = '<h6>' . __( 'Custom Tooltip', 'gravity-tooltips' ) . '</h6>';
 
 		// the text
-		$text	= __( 'Enter the content you want to appear in the tooltip for this field.', 'gravity-tooltips' );
+		$text   = __( 'Enter the content you want to appear in the tooltip for this field.', 'gravity-tooltips' );
 
-		$tooltips['custom_tooltip_tip'] = $title.$text;
+		$tooltips['custom_tooltip_tip'] = $title . $text;
 
+		// return the actual tooltip
 		return $tooltips;
-	}
-
-
-	/**
-	 * register our settings for later
-	 * @return void
-	 */
-	public function reg_settings() {
-
-		register_setting( 'gf-tooltips', 'gf-tooltips');
-
 	}
 
 	/**
 	 * display message on saved settings
+	 *
 	 * @return [HTML] message above page
 	 */
 	public function settings_saved() {
 
 		// first check to make sure we're on our settings
-		if ( ! isset( $_REQUEST['page'] ) || isset( $_REQUEST['page'] ) && $_REQUEST['page'] !== 'gf-tooltips' )
+		if ( empty( $_GET['page'] ) || $_GET['page'] !== 'gf-tooltips' ) {
 			return;
+		}
 
 		// make sure we have our updated prompt
-		if ( ! isset( $_REQUEST['settings-updated'] ) || isset( $_REQUEST['settings-updated'] ) && $_REQUEST['settings-updated'] !== 'true' )
+		if ( empty( $_GET['settings-updated'] ) ) {
 			return;
+		}
 
-		echo '<div id="message" class="updated">';
-			echo '<p>'.__( 'Settings have been saved.', 'gravity-tooltips' ).'</p>';
+		// show our update messages
+		echo '<div id="message" class="updated notice fade is-dismissible">';
+			echo '<p>' . __( 'Settings have been saved.', 'gravity-tooltips' ) . '</p>';
 		echo '</div>';
 
+		// and return
 		return;
 	}
 
 	/**
 	 * Display main options page structure
+	 *
 	 * @return [mixed HTML] the settings page
 	 */
-	public function settings_page() {
+	public static function settings_page() {
 
-		if ( ! current_user_can( 'manage_options' ) )
+		// bail without caps
+		if ( ! current_user_can( 'manage_options' ) ) {
 			return;
+		}
 
+		// set up our form wrapper
 		echo '<div class="wrap">';
+
+			// title it
 			echo '<h2>'. __( 'Gravity Forms Tooltips', 'gravity-tooltips' ) . '</h2>';
 
-			echo '<div id="poststuff" class="metabox-holder has-right-sidebar">';
-
-			echo self::settings_side();
-			echo self::settings_open();
-
+			// wrap it
 			echo '<form method="post" action="options.php">';
-				settings_fields( 'gf-tooltips' );
-				$data	= get_option( 'gf-tooltips' );
+
+				// fetch the data
+				$data   = GF_Tooltips_Helper::get_tooltip_data();
 
 				// option index checks
-				$style		= isset( $data['style'] )		? $data['style']	: 'icon';
-				$design		= isset( $data['design'] )		? $data['design']	: 'light';
-				$target		= isset( $data['target'] )		? $data['target']	: 'topRight';
-				$location	= isset( $data['location'] )	? $data['location']	: 'bottomLeft';
+				$type       = ! empty( $data['type'] ) ? $data['type'] : 'icon';
+				$design     = ! empty( $data['design'] ) ? $data['design'] : 'light';
+				$target     = ! empty( $data['target'] ) ? $data['target'] : 'right';
+
+				// our nonce and whatnot
+				settings_fields( 'gf-tooltips' );
 
 				echo '<table class="form-table gf-tooltip-table"><tbody>';
 
 					echo '<tr>';
-						echo '<th scope="row">' . __( 'Style', 'gravity-tooltips' ) . '</th>';
+						echo '<th scope="row">' . __( 'Layout Type', 'gravity-tooltips' ) . '</th>';
 						echo '<td>';
 							echo '<p>';
-							echo '<input id="gf-style-label" class="gf-tooltip-style" type="radio" name="gf-tooltips[style]" value="label" ' . checked( $style, 'label', false ) . ' />';
-							echo '<label for="gf-style-label">' . __('Apply tooltip to existing label', 'gravity-tooltips' ) . '</label>';
+							echo '<input id="gf-type-label" class="gf-tooltip-type" type="radio" name="gf-tooltips[type]" value="label" ' . checked( $type, 'label', false ) . ' />';
+							echo '<label for="gf-type-label">' . __('Apply tooltip to existing label', 'gravity-tooltips' ) . '</label>';
 							echo '</p>';
 
 							echo '<p>';
-							echo '<input id="gf-style-icon" class="gf-tooltip-style" type="radio" name="gf-tooltips[style]" value="icon" ' . checked( $style, 'icon', false ) . ' />';
-							echo '<label for="gf-style-icon">' . __( 'Insert tooltip icon next to label', 'gravity-tooltips' ) . '</label>';
+							echo '<input id="gf-type-icon" class="gf-tooltip-type" type="radio" name="gf-tooltips[type]" value="icon" ' . checked( $type, 'icon', false ) . ' />';
+							echo '<label for="gf-type-icon">' . __( 'Insert tooltip icon next to label', 'gravity-tooltips' ) . '</label>';
 							echo '</p>';
 
 							echo '<p>';
-							echo '<input id="gf-style-single" class="gf-tooltip-style" type="radio" name="gf-tooltips[style]" value="single" ' . checked( $style, 'single', false ) . ' />';
-							echo '<label for="gf-style-single">' . __( 'Insert tooltip underneath input field.', 'gravity-tooltips' ) . '</label>';
+							echo '<input id="gf-type-single" class="gf-tooltip-type" type="radio" name="gf-tooltips[type]" value="single" ' . checked( $type, 'single', false ) . ' />';
+							echo '<label for="gf-type-single">' . __( 'Insert tooltip underneath input field.', 'gravity-tooltips' ) . '</label>';
 							echo '</p>';
 
 						echo '</td>';
@@ -254,7 +317,7 @@ class GF_Tooltips_Admin
 						echo '<th scope="row">' . __( 'Design Style', 'gravity-tooltips' ) . '</th>';
 						echo '<td>';
 							echo '<select name="gf-tooltips[design]" id="gf-option-design">';
-							echo GF_Tooltips::get_qtip_designs( $design );
+							echo self::get_admin_designs( $design );
 							echo '</select>';
 						echo '</td>';
 					echo '</tr>';
@@ -263,19 +326,9 @@ class GF_Tooltips_Admin
 						echo '<th scope="row">' . __( 'Target', 'gravity-tooltips' ) . '</th>';
 						echo '<td>';
 							echo '<select name="gf-tooltips[target]" id="gf-option-Target">';
-							echo GF_Tooltips::get_qtip_placement( $target );
+							echo self::get_admin_placement( $target );
 							echo '</select>';
 							echo '<p class="description">' . __( 'The placement of the tooltip box in relation to the label / icon.', 'gravity-tooltips' ) . '</p>';
-						echo '</td>';
-					echo '</tr>';
-
-					echo '<tr>';
-						echo '<th scope="row">' . __( 'Location', 'gravity-tooltips' ) . '</th>';
-						echo '<td>';
-							echo '<select name="gf-tooltips[location]" id="gf-option-location">';
-							echo GF_Tooltips::get_qtip_placement( $location );
-							echo '</select>';
-							echo '<p class="description">' . __( 'The location on the label / icon for the tooltip box to affix to.', 'gravity-tooltips' ) . '</p>';
 						echo '</td>';
 					echo '</tr>';
 
@@ -286,81 +339,135 @@ class GF_Tooltips_Admin
 			echo '</form>';
 
 			echo '<p>';
-				echo sprintf( __( 'A more detailed explanation about how the tooltip placement and location can be found <a href="%s" target="_blank">here</a>.', 'gravity-tooltips' ), 'http://craigsworks.com/projects/qtip/docs/tutorials/#position' );
+				echo sprintf( __( 'A more detailed explanation about how the tooltip placement and design choices can be found <a href="%s" target="_blank">here</a>.', 'gravity-tooltips' ), 'http://kushagragour.in/lab/hint/' );
 			echo '</p>';
 
-			echo self::settings_close();
 
-			echo '</div>';
 		echo '</div>';
-
 	}
 
 	/**
-	 * Some extra stuff for the settings page
-	 * this is just to keep the area cleaner
+	 * set up all the possible field types
 	 *
-	 * @return [mixed HTML] sidebar stuff on settings page
+	 * @return array   all the field types
 	 */
-	static function settings_side() { ?>
+	public static function show_field_item_types() {
 
-		<div id="side-info-column" class="inner-sidebar">
-			<div class="meta-box-sortables">
-				<div id="admin-about" class="postbox">
-					<h3 class="hndle" id="about-sidebar"><?php _e('About the Plugin') ?></h3>
-					<div class="inside">
-						<p>Talk to <a href="http://twitter.com/norcross" target="_blank">@norcross</a> on twitter or visit the <a href="http://wordpress.org/support/plugin//" target="_blank">plugin support form</a> for bugs or feature requests.</p>
-						<p><?php _e('<strong>Enjoy the plugin?</strong>') ?><br />
-						<a href="http://twitter.com/?status=I'm using @norcross's PLUGIN NAME - check it out! http://l.norc.co//" target="_blank"><?php _e('Tweet about it') ?></a> <?php _e('and consider donating.') ?></p>
-						<p><?php _e('<strong>Donate:</strong> A lot of hard work goes into building plugins - support your open source developers. Include your twitter username and I\'ll send you a shout out for your generosity. Thank you!') ?><br />
-						<form action="https://www.paypal.com/cgi-bin/webscr" method="post" target="_blank">
-						<input type="hidden" name="cmd" value="_s-xclick">
-						<input type="hidden" name="hosted_button_id" value="11085100">
-						<input type="image" src="https://www.paypalobjects.com/en_US/i/btn/btn_donate_SM.gif" border="0" name="submit" alt="PayPal - The safer, easier way to pay online!">
-						<img alt="" border="0" src="https://www.paypalobjects.com/en_US/i/scr/pixel.gif" width="1" height="1">
-						</form></p>
-					</div>
-				</div>
-			</div>
+		// set the array
+		$defaults   = array(
+			'text',
+			'creditcard',
+			'website',
+			'phone',
+			'number',
+			'date',
+			'time',
+			'textarea',
+			'select',
+			'multiselect',
+			'checkbox',
+			'radio',
+			'name',
+			'address',
+			'fileupload',
+			'email',
+			'post_title',
+			'post_content',
+			'post_excerpt',
+			'post_tags',
+			'post_category',
+			'post_image',
+			'captcha',
+			'product',
+			'singleproduct',
+			'calculation',
+			'price',
+			'hiddenproduct',
+			'list',
+			'shipping',
+			'singleshipping',
+			'option',
+			'quantity',
+			'donation',
+			'total',
+			'post_custom_field',
+			'password'
+		);
 
-			<div class="meta-box-sortables">
-				<div id="admin-more" class="postbox">
-					<h3 class="hndle" id="about-sidebar"><?php _e('Links') ?></h3>
-					<div class="inside">
-						<ul>
-						<li><a href="http://wordpress.org/extend/plugins//" target="_blank">Plugin on WP.org</a></li>
-						<li><a href="https://github.com/norcross/" target="_blank">Plugin on GitHub</a></li>
-						<li><a href="http://wordpress.org/support/plugin/" target="_blank">Support Forum</a><li>
-						</ul>
-					</div>
-				</div>
-			</div>
-		</div> <!-- // #side-info-column .inner-sidebar -->
+		// return the types, filtered
+		return apply_filters( 'gf_tooltips_allowed_fields', $defaults );
+	}
 
-	<?php }
+	/**
+	 * get the placemend descriptions
+	 *
+	 * @param  string $current  the current selection (if it exists)
+	 *
+	 * @return mixed/HTML
+	 */
+	public static function get_admin_placement( $current = '' ) {
 
-	static function settings_open() { ?>
+		// set our array
+		$options   = array(
+			'top'       => __( 'Top', 'gravity-tooltips' ),
+			'right'     => __( 'Right', 'gravity-tooltips' ),
+			'bottom'    => __( 'Bottom', 'gravity-tooltips' ),
+			'left'      => __( 'Left', 'gravity-tooltips' ),
+		);
 
-		<div id="post-body" class="has-sidebar">
-			<div id="post-body-content" class="has-sidebar-content">
-				<div id="normal-sortables" class="meta-box-sortables">
-					<div id="gf-tooltip-settings" class="postbox">
-						<div class="inside gf-tooltip-inside">
+		// set an empty
+		$drop   = '';
 
-	<?php }
+		// loop them and make a dropdown
+		foreach ( $options as $key => $label ) {
+			$drop  .= '<option value="' . esc_attr( $key ) . '"' . selected( $current, $key, false ) . '>' . esc_attr( $label ) . '</option>';
+		}
 
-	static function settings_close() { ?>
+		// return it
+		return $drop;
+	}
 
-						<br class="clear" />
-						</div>
-					</div>
-				</div>
-			</div>
-		</div>
+	/**
+	 * get the dropdown for the design
+	 *
+	 * @param  string $current [description]
+	 *
+	 * @return mixed/HTML
+	 */
+	public static function get_admin_designs( $current = '' ) {
 
-	<?php }
+		// set our array
+		$options   = array(
+			'light'     => __( 'Light', 'gravity-tooltips' ),
+			'dark'      => __( 'Dark', 'gravity-tooltips' ),
+			'success'   => __( 'Green', 'gravity-tooltips' ),
+			'info'      => __( 'Blue', 'gravity-tooltips' ),
+			'error'     => __( 'Red', 'gravity-tooltips' ),
+			'warning'   => __( 'Orange', 'gravity-tooltips' )
+		);
 
-/// end class
+		// filter the design options
+		$options   = apply_filters( 'gf_tooltips_design_options', $options );
+
+		// set an empty
+		$drop   = '';
+
+		// loop them and make a dropdown
+		foreach ( $options as $key => $label ) {
+			$drop  .= '<option value="' . esc_attr( $key ) . '"' . selected( $current, $key, false ) . '>' . esc_attr( $label ) . '</option>';
+		}
+
+		// return it
+		return $drop;
+	}
+
+
+// end class
 }
 
-new GF_Tooltips_Admin();
+// end exists check
+}
+
+// Instantiate our class
+$GF_Tooltips_Admin = new GF_Tooltips_Admin();
+$GF_Tooltips_Admin->init();
