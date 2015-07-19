@@ -284,6 +284,7 @@ class GF_Tooltips_Admin
 
 				// option index checks
 				$type       = ! empty( $data['type'] ) ? $data['type'] : 'icon';
+				$icon       = ! empty( $data['icon'] ) ? $data['icon'] : 'question';
 				$design     = ! empty( $data['design'] ) ? $data['design'] : 'light';
 				$target     = ! empty( $data['target'] ) ? $data['target'] : 'right';
 
@@ -297,7 +298,7 @@ class GF_Tooltips_Admin
 						echo '<td>';
 							echo '<p>';
 							echo '<input id="gf-type-label" class="gf-tooltip-type" type="radio" name="gf-tooltips[type]" value="label" ' . checked( $type, 'label', false ) . ' />';
-							echo '<label for="gf-type-label">' . __('Apply tooltip to existing label', 'gravity-tooltips' ) . '</label>';
+							echo '<label for="gf-type-label">' . __( 'Apply tooltip to existing label', 'gravity-tooltips' ) . '</label>';
 							echo '</p>';
 
 							echo '<p>';
@@ -308,6 +309,23 @@ class GF_Tooltips_Admin
 							echo '<p>';
 							echo '<input id="gf-type-single" class="gf-tooltip-type" type="radio" name="gf-tooltips[type]" value="single" ' . checked( $type, 'single', false ) . ' />';
 							echo '<label for="gf-type-single">' . __( 'Insert tooltip underneath input field.', 'gravity-tooltips' ) . '</label>';
+							echo '</p>';
+
+						echo '</td>';
+					echo '</tr>';
+
+					echo '<tr>';
+						echo '<th scope="row">' . __( 'Icon Type', 'gravity-tooltips' ) . '</th>';
+						echo '<td>';
+
+							echo '<p>';
+							echo '<input id="gf-icon-question" class="gf-tooltip-icon" type="radio" name="gf-tooltips[icon]" value="question" ' . checked( $icon, 'question', false ) . ' />';
+							echo '<label for="gf-icon-question">' . __( 'Question Mark', 'gravity-tooltips' ) . '</label>';
+							echo '</p>';
+
+							echo '<p>';
+							echo '<input id="gf-icon-info" class="gf-tooltip-icon" type="radio" name="gf-tooltips[icon]" value="info" ' . checked( $icon, 'info', false ) . ' />';
+							echo '<label for="gf-icon-info">' . __( 'Information Mark', 'gravity-tooltips' ) . '</label>';
 							echo '</p>';
 
 						echo '</td>';

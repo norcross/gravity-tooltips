@@ -118,6 +118,7 @@ class GF_Tooltips
 		// set a data array
 		$data   = array(
 			'type'      => 'icon',
+			'icon'      => 'question',
 			'design'    => 'light',
 			'target'    => 'right',
 		);

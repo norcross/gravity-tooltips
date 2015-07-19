@@ -171,11 +171,6 @@ class GF_Tooltips_Front
 	 */
 	public function scripts_styles( $form, $is_ajax ) {
 
-		// make sure we want fontawesome
-		if ( false !== $fontawesome = apply_filters( 'gf_tooltips_use_fontawesome', true ) ) {
-			wp_enqueue_style( 'fontawesome', '//maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css', array(), '4.3.0', 'all' );
-		}
-
 		// set our filename based on debug
 		$file   = defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ? 'hint.css' : 'hint.min.css';
 
@@ -231,8 +226,11 @@ class GF_Tooltips_Front
 	 */
 	public static function get_tooltip_icon() {
 
+		// get the selected icon type
+		$icon   = GF_Tooltips_Helper::get_tooltip_data( 'icon', 'question' );
+
 		// set the icon class
-		$class  = apply_filters( 'gf_tooltips_icon_class', 'fa fa-question-circle' );
+		$class  = apply_filters( 'gf_tooltips_icon_class', 'gftip gftip-' . esc_attr( $icon ) . '-circle' );
 
 		// return it
 		return apply_filters( 'gf_tooltips_icon', '<i class="' . esc_attr( $class ) . '"></i>' );
