@@ -433,6 +433,9 @@ class GF_Tooltips_Admin
 			'left'      => __( 'Left', 'gravity-tooltips' ),
 		);
 
+		// filter the placement options
+		$options   = apply_filters( 'gf_tooltips_placement_options', $options );
+
 		// set an empty
 		$drop   = '';
 
