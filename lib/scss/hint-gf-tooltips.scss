@@ -1,0 +1,73 @@
+/**
+ * source: hint-gf-tooltips.scss
+ *
+ * Adds the custom stuff for the GF Tooltips plugins
+ *
+ * Classes added:
+ * 	1) hint--always
+ *
+ */
+
+// setting a defined font-weight on tooltip content
+.hint:after, [data-hint]:after {
+    font-weight: normal;
+}
+
+
+/**
+ * adding our light color scheme
+ */
+.hint--light:after {
+	background-color: #efefef;
+	color: #383838;
+	text-shadow: 0 -1px 0px #dedede;
+}
+
+.hint--light.hint--top:before {
+	border-top-color: #efefef;
+}
+
+.hint--light.hint--bottom:before {
+	border-bottom-color: #efefef;
+}
+
+.hint--light.hint--left:before {
+	border-left-color: #efefef;
+}
+
+.hint--light.hint--right:before {
+	border-right-color: #efefef;
+}
+
+
+/**
+ * the CSS tied to the icon itself
+ */
+span.gf-icon {
+	font-size: 16px;
+	line-height: 1;
+	display: inline-block;
+	vertical-align: top;
+	margin: 0;
+	padding: 0 0.375em;
+}
+
+span.gf-icon .fa {
+	margin: 0;
+	background-color: transparent;
+	box-shadow: none;
+	color: #565656;
+	-webkit-transition: all 0.3s ease;
+	-moz-transition: all 0.3s ease;
+	-ms-transition: all 0.3s ease;
+	-o-transition: all 0.3s ease;
+	transition: all 0.3s ease;
+}
+
+span.gf-icon:hover .fa,
+span.gf-icon:focus .fa {
+	-ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=50)";
+	filter: alpha(opacity=50);
+	opacity: 0.5;
+	cursor: help;
+}
