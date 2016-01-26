@@ -1,0 +1,38 @@
+{
+  "name": "gravity-tooltips",
+  "title": "Gravity Forms Tooltips",
+  "description": "Add custom tooltips in Gravity Forms.",
+  "version": "2.0.1",
+  "homepage": "https://github.com/norcross/gravity-tooltips",
+  "author": {
+    "name": "Andrew Norcross",
+    "email": "andrew.norcross@gmail.com",
+    "url": "http://andrewnorcross.com"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:norcross/gravity-tooltips.git"
+  },
+  "bugs": {
+    "url": "https://github.com/norcross/gravity-tooltips/issues"
+  },
+  "license": "MIT",
+  "keywords": [
+    "tooltip",
+    "gravityforms"
+  ],
+  "devDependencies": {
+    "grunt": ">= 0.4.5",
+    "grunt-auto-install": ">= 0.2.3",
+    "grunt-check-modules": ">= 1.0.0",
+    "grunt-contrib-concat": ">=0.5.0",
+    "grunt-contrib-cssmin": ">=0.14.0",
+    "grunt-contrib-watch": ">= 0.6.1",
+    "grunt-dev-update": ">= 1.3.0",
+    "grunt-contrib-uglify": ">= 0.5.0",
+    "grunt-contrib-sass": ">= 0.7.3",
+    "grunt-install-dependencies": ">= 0.2.0",
+    "grunt-required": ">= 0.1.2",
+    "grunt-sass": "^1.1.0"
+  }
+}

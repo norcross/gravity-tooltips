@@ -4,15 +4,27 @@
  * Adds the custom stuff for the GF Tooltips plugins
  *
  * Classes added:
- * 	1) hint--always
+ * 	1) hint--base
+ * 	2) hint--light
  *
  */
 
-// setting a defined font-weight on tooltip content
+/**
+ * setting a defined font-weight on tooltip content
+ */
 .hint:after, [data-hint]:after {
     font-weight: normal;
 }
 
+/**
+ * set up the font size and line
+ * height on the base class
+ */
+.hint--base:after {
+	font-size: 14px;
+	line-height: 20px;
+	white-space: pre;
+}
 
 /**
  * adding our light color scheme
@@ -81,7 +93,7 @@ span.gf-icon {
 	font-size: 16px;
 	line-height: 1;
 	display: inline-block;
-	vertical-align: top;
+	vertical-align: middle;
 	margin: 0;
 	padding: 0 0.375em;
 }

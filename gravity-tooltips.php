@@ -1,49 +1,68 @@
 <?php
+/**
+ * Plugin Name: Gravity Forms Tooltips
+ * Plugin URI: https://github.com/norcross/gravity-tooltips
+ * Description: Add custom tooltips in Gravity Forms.
+ * Author: Andrew Norcross
+ * Author URI: http://andrewnorcross.com/
+ * Version: 2.0.1
+ * Text Domain: gravity-tooltips
+ * Requires WP: 4.0
+ * Domain Path: languages
+ * GitHub Plugin URI: https://github.com/norcross/gravity-tooltips
+ */
+
 /*
-Plugin Name: Gravity Forms Tooltips
-Plugin URI: http://andrewnorcross.com/plugins/gravity-tooltips/
-Description: Add custom tooltips in Gravity Forms.
-Author: Andrew Norcross
-Version: 2.0.0
-Requires at least: 3.8
-Author URI: http://andrewnorcross.com
-*/
-/*  Copyright 2014 Andrew Norcross
+ * The MIT License (MIT)
+ *
+ * Copyright (c) 2015 Andrew Norcross
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
+ */
 
-	This program is free software; you can redistribute it and/or modify
-	it under the terms of the GNU General Public License as published by
-	the Free Software Foundation; version 2 of the License (GPL v2) only.
-
-	This program is distributed in the hope that it will be useful,
-	but WITHOUT ANY WARRANTY; without even the implied warranty of
-	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-	GNU General Public License for more details.
-
-	You should have received a copy of the GNU General Public License
-	along with this program; if not, write to the Free Software
-	Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-*/
-
-
+// Define our base if we haven't already.
 if( ! defined( 'GFT_BASE' ) ) {
 	define( 'GFT_BASE', plugin_basename(__FILE__) );
 }
 
+// Define our version if we haven't already.
 if( ! defined( 'GFT_VER' ) ) {
-	define( 'GFT_VER', '2.0.0' );
+	define( 'GFT_VER', '2.0.1' );
 }
 
+/**
+ * Core class.
+ *
+ * Contains the loading functionality and sets our default options.
+ */
 class GF_Tooltips
 {
 
 	/**
-	 * Static property to hold our singleton instance
+	 * Static property to hold our singleton instance.
+	 *
 	 * @var instance
 	 */
 	static $instance = false;
 
 	/**
-	 * This is our constructor
+	 * This is our constructor. there are many like it, but this one is mine.
 	 *
 	 * @return GF_Tooltips
 	 */
@@ -51,7 +70,7 @@ class GF_Tooltips
 		add_action(	'plugins_loaded',						array( $this, 'textdomain'			)			);
 		add_action(	'plugins_loaded',						array( $this, 'load_files'			)			);
 
-		// activation hooks
+		// Activation hook.
 		register_activation_hook( __FILE__,                 array( $this, 'set_options'         )           );
 	}
 
@@ -59,21 +78,21 @@ class GF_Tooltips
 	 * If an instance exists, this returns it.  If not, it creates one and
 	 * retuns it.
 	 *
-	 * @return
+	 * @return $instance
 	 */
 	public static function getInstance() {
 
-		// check for an instance of the class before loading
+		// Check for an instance of the class before loading.
 		if ( ! self::$instance ) {
 			self::$instance = new self;
 		}
 
-		// return the instance
+		// Return the instance.
 		return self::$instance;
 	}
 
 	/**
-	 * load textdomain
+	 * Load our textdomain.
 	 *
 	 * @return string load_plugin_textdomain
 	 */
@@ -82,40 +101,40 @@ class GF_Tooltips
 	}
 
 	/**
-	 * load our files
+	 * Load our files.
 	 *
-	 * @return [type] [description]
+	 * @return void
 	 */
 	public function load_files() {
 
-		// load our admin setup
+		// Load our admin setup.
 		if ( is_admin() ) {
 			require_once( 'lib/admin.php' );
 		}
 
-		// load our front end setup
+		// Load our front end setup.
 		if ( ! is_admin() ) {
 			require_once( 'lib/front.php' );
 		}
 
-		// load our helper
+		// Load our helper.
 		require_once( 'lib/helper.php' );
 	}
 
 	/**
-	 * set our options if
+	 * Set our options on activation.
 	 */
 	public function set_options() {
 
-		// check for data first
+		// Check for data first.
 		$exist  = get_option( 'gf-tooltips' );
 
-		// we have it. leave it alone
+		// We have it. leave it alone.
 		if ( ! empty( $exist ) ) {
 			return;
 		}
 
-		// set a data array
+		// Set a data array.
 		$data   = array(
 			'type'      => 'icon',
 			'icon'      => 'question',
@@ -123,11 +142,14 @@ class GF_Tooltips
 			'target'    => 'right',
 		);
 
-		// add the option
+		// Filter them.
+		apply_filters( 'gf_tooltips_default_settings', $data );
+
+		// Add the option.
 		update_option( 'gf-tooltips', $data, 'no' );
 	}
 
-/// end class
+	// End our class.
 }
 
 // Instantiate our class
