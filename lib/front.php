@@ -97,8 +97,16 @@ class GF_Tooltips_Front
 			return $content;
 		}
 
+		// Fetch our field types.
+		$ftypes = GF_Tooltips_Helper::show_field_item_types();
+
+		// Bail if this object has no type, or isn't one we allow.
+		if ( empty( $field->type ) || ! in_array( $field->type, $ftypes ) ) {
+			return $content;
+		}
+
 		// Bail if no tooltip actually exists.
-		if ( empty( $field['customTooltip'] ) ) {
+		if ( empty( $field->customTooltip ) ) {
 			return $content;
 		}
 
@@ -108,12 +116,12 @@ class GF_Tooltips_Front
 		}
 
 		// Filter the text.
-		if ( false === $text = apply_filters( 'gf_tooltips_text', $field['customTooltip'], $field, $form_id ) ) {
+		if ( false === $text = apply_filters( 'gf_tooltips_text', $field->customTooltip, $field, $form_id ) ) {
 			return $content;
 		}
 
 		// Render and return.
-		return self::render_tooltip_markup( $field['customTooltip'], $type, $content, $field, $form_id );
+		return self::render_tooltip_markup( $field->customTooltip, $type, $content, $field, $form_id );
 	}
 
 	/**
@@ -135,17 +143,23 @@ class GF_Tooltips_Front
 		$class  = self::get_tooltip_class( $design, $target, $type );
 
 		// Build out label version.
-		if ( $type == 'label' ) {
+		if ( 'label' === $type ) {
+
+			// Determine which label class to filter based on field type.
+			$lclass = 'section' === $field->type ? 'gsection_title' : 'gfield_label';
+
+			// Determine what to attach to, since sections get handled differently due to markup differences.
+			$attach = 'section' === $field->type ? '<h2' : '<label';
 
 			// First add the class.
-			$render = GF_Tooltips_Helper::str_replace_limit( 'gfield_label', 'gfield_label ' . $class, $render );
+			$render = GF_Tooltips_Helper::str_replace_limit( $lclass, $lclass . ' ' . $class, $render );
 
 			// Now add the tooltip.
-			$render = GF_Tooltips_Helper::str_replace_limit( '<label', '<label data-hint="' . esc_attr( $text ) . '"', $render );
+			$render = GF_Tooltips_Helper::str_replace_limit( $attach, $attach . ' data-hint="' . esc_attr( $text ) . '"', $render );
 		}
 
 		// Build out icon version.
-		if ( $type == 'icon' ) {
+		if ( 'icon' === $type ) {
 
 			// Get my icon.
 			$icon   = self::get_tooltip_icon();
@@ -153,12 +167,15 @@ class GF_Tooltips_Front
 			// Build the markup.
 			$setup  = '<span class="gf-icon ' . $class . '" data-hint="' . esc_attr( $text ) . '">' . $icon . '</span>';
 
-			// Render it.
-			$render = GF_Tooltips_Helper::str_replace_limit( '</label>', $setup . '</label>', $render );
+			// Determine what to attach to, since sections get handled differently due to markup differences.
+			$attach = 'section' === $field->type ? '</h2>' : '</label>';
+
+			// And render it.
+			$render = GF_Tooltips_Helper::str_replace_limit( $attach, $setup . $attach, $render );
 		}
 
 		// Build out single version.
-		if ( $type == 'single' ) {
+		if ( 'single' === $type ) {
 
 			// Get my icon.
 			$icon   = self::get_tooltip_icon();
@@ -166,8 +183,11 @@ class GF_Tooltips_Front
 			// Build the markup.
 			$setup  = '<span class="gf-icon ' . $class . '" data-hint="' . esc_attr( $text ) . '">' . $icon . '</span>';
 
+			// Determine what to attach to, since sections get handled differently due to markup differences.
+			$attach = 'section' === $field->type ? '</h2>' : '</div>';
+
 			// Render it.
-			$render = GF_Tooltips_Helper::str_replace_limit( '</div>', '</div>' . $setup, $render );
+			$render = GF_Tooltips_Helper::str_replace_limit( $attach, $attach . $setup, $render );
 		}
 
 		// Return field content with new tooltip.

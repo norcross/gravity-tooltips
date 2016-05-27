@@ -1,3 +1,7 @@
+#### Version 2.0.2 - 2016/05/27
+* added ability to include tooltips on section blocks
+* moved `gf_tooltips_allowed_fields` filter from `admin.php` file to `helper.php` file to allow checks on front end
+* minor cleanup
 
 #### Version 2.0.1 - 2016/01/26
 * added GitHub Updater support

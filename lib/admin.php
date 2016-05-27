@@ -58,7 +58,7 @@ class GF_Tooltips_Admin
 		wp_enqueue_script( 'gftips-admin', plugins_url( '/js/gftips.admin.js', __FILE__ ),  array( 'jquery' ),  GFT_VER, true );
 		wp_localize_script( 'gftips-admin', 'gftipsAdmin',
 			array(
-				'fldTypes' => self::show_field_item_types()
+				'fldTypes' => GF_Tooltips_Helper::show_field_item_types()
 			)
 		);
 	}
@@ -344,58 +344,6 @@ class GF_Tooltips_Admin
 			echo '</p>';
 
 		echo '</div>';
-	}
-
-	/**
-	 * Set up all the possible field types.
-	 *
-	 * @return array $fields  All the field types.
-	 */
-	public static function show_field_item_types() {
-
-		// Set the array of field types.
-		$fields = array(
-			'text',
-			'creditcard',
-			'website',
-			'phone',
-			'number',
-			'date',
-			'time',
-			'textarea',
-			'select',
-			'multiselect',
-			'checkbox',
-			'radio',
-			'name',
-			'address',
-			'fileupload',
-			'email',
-			'post_title',
-			'post_content',
-			'post_excerpt',
-			'post_tags',
-			'post_category',
-			'post_image',
-			'captcha',
-			'product',
-			'singleproduct',
-			'calculation',
-			'price',
-			'hiddenproduct',
-			'list',
-			'shipping',
-			'singleshipping',
-			'option',
-			'quantity',
-			'donation',
-			'total',
-			'post_custom_field',
-			'password'
-		);
-
-		// Return the types, filtered.
-		return apply_filters( 'gf_tooltips_allowed_fields', $fields );
 	}
 
 	/**
