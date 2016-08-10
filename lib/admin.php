@@ -282,6 +282,7 @@ class GF_Tooltips_Admin
 
 				// Option index checks.
 				$type       = ! empty( $data['type'] ) ? $data['type'] : 'icon';
+				$size       = ! empty( $data['size'] ) ? $data['size'] : 'default';
 				$icon       = ! empty( $data['icon'] ) ? $data['icon'] : 'question';
 				$design     = ! empty( $data['design'] ) ? $data['design'] : 'light';
 				$target     = ! empty( $data['target'] ) ? $data['target'] : 'right';
@@ -307,6 +308,33 @@ class GF_Tooltips_Admin
 							echo '<p>';
 							echo '<input id="gf-type-single" class="gf-tooltip-type" type="radio" name="gf-tooltips[type]" value="single" ' . checked( $type, 'single', false ) . ' />';
 							echo '<label for="gf-type-single">' . __( 'Insert tooltip underneath input field.', 'gravity-tooltips' ) . '</label>';
+							echo '</p>';
+
+						echo '</td>';
+					echo '</tr>';
+
+					echo '<tr>';
+						echo '<th scope="row">' . __( 'Tooltip Size', 'gravity-tooltips' ) . '</th>';
+						echo '<td>';
+
+							echo '<p>';
+							echo '<input id="gf-size-default" class="gf-tooltip-size" type="radio" name="gf-tooltips[size]" value="default" ' . checked( $size, 'default', false ) . ' />';
+							echo '<label for="gf-size-default">' . __( 'Default', 'gravity-tooltips' ) . '</label>';
+							echo '</p>';
+
+							echo '<p>';
+							echo '<input id="gf-size-small" class="gf-tooltip-size" type="radio" name="gf-tooltips[size]" value="small" ' . checked( $size, 'small', false ) . ' />';
+							echo '<label for="gf-size-small">' . __( 'Small', 'gravity-tooltips' ) . '</label>';
+							echo '</p>';
+
+							echo '<p>';
+							echo '<input id="gf-size-medium" class="gf-tooltip-size" type="radio" name="gf-tooltips[size]" value="medium" ' . checked( $size, 'medium', false ) . ' />';
+							echo '<label for="gf-size-medium">' . __( 'Medium', 'gravity-tooltips' ) . '</label>';
+							echo '</p>';
+
+							echo '<p>';
+							echo '<input id="gf-size-large" class="gf-tooltip-size" type="radio" name="gf-tooltips[size]" value="large" ' . checked( $size, 'large', false ) . ' />';
+							echo '<label for="gf-size-large">' . __( 'Large', 'gravity-tooltips' ) . '</label>';
 							echo '</p>';
 
 						echo '</td>';

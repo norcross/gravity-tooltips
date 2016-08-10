@@ -135,12 +135,13 @@ class GF_Tooltips_Front
 	 */
 	public static function render_tooltip_markup( $text = '', $type = '', $render = '', $field, $form_id ) {
 
-		// Grab our tooltip design and target.
+		// Grab our tooltip design, target, and size.
 		$design = GF_Tooltips_Helper::get_tooltip_data( 'design', 'light' );
 		$target = GF_Tooltips_Helper::get_tooltip_data( 'target', 'right' );
+		$size   = GF_Tooltips_Helper::get_tooltip_data( 'size', 'default' );
 
 		// Set a class.
-		$class  = self::get_tooltip_class( $design, $target, $type );
+		$class  = self::get_tooltip_class( $design, $target, $type, $size );
 
 		// Build out label version.
 		if ( 'label' === $type ) {
@@ -200,16 +201,22 @@ class GF_Tooltips_Front
 	 * @param  string $design  The user-selected design layout.
 	 * @param  string $target  The user-selected placement.
 	 * @param  string $type    The field type.
+	 * @param  string $size    The tooltip size.
 	 *
 	 * @return string $class   The full class string used on a field.
 	 */
-	public static function get_tooltip_class( $design = '', $target = '', $type = '' ) {
+	public static function get_tooltip_class( $design = '', $target = '', $type = '', $size = 'default' ) {
 
 		// Set an empty.
 		$class  = '';
 
 		// Set the base class.
 		$class .= 'hint--base hint--' . esc_attr( $design ) . ' hint--' . esc_attr( $target );
+
+		// Check for a sizing setup.
+		if ( ! empty( $size ) && 'default' !== $size ) {
+			$class .= ' hint--has-size hint--' . esc_attr( $size );
+		}
 
 		// Check for bounce.
 		if ( false !== $bounce = apply_filters( 'gf_tooltips_bounce', true ) ) {

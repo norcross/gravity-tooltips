@@ -5,7 +5,7 @@
  * Description: Add custom tooltips in Gravity Forms.
  * Author: Andrew Norcross
  * Author URI: http://andrewnorcross.com/
- * Version: 2.0.2
+ * Version: 2.0.3
  * Text Domain: gravity-tooltips
  * Requires WP: 4.0
  * Domain Path: languages
@@ -37,13 +37,13 @@
  */
 
 // Define our base if we haven't already.
-if( ! defined( 'GFT_BASE' ) ) {
+if ( ! defined( 'GFT_BASE' ) ) {
 	define( 'GFT_BASE', plugin_basename(__FILE__) );
 }
 
 // Define our version if we haven't already.
-if( ! defined( 'GFT_VER' ) ) {
-	define( 'GFT_VER', '2.0.2' );
+if ( ! defined( 'GFT_VER' ) ) {
+	define( 'GFT_VER', '2.0.3' );
 }
 
 /**
@@ -106,6 +106,11 @@ class GF_Tooltips
 	 * @return void
 	 */
 	public function load_files() {
+
+		// Confirm we have our actual Gravity Forms class first.
+		if ( ! class_exists( 'RGForms' ) ) {
+			return;
+		}
 
 		// Load our admin setup.
 		if ( is_admin() ) {

@@ -10,7 +10,7 @@
  * 	1) hint
  */
 
-[data-hint] {
+[class*="#{$hintPrefix}"] {
 	position: relative;
 	display: inline-block;
 
@@ -26,12 +26,12 @@
 		// shows the tooltip.
 		visibility: hidden;
 		opacity: 0;
-		z-index: $zIndex;
+		z-index: $hintZIndex;
 		// shouldn't receive pointer events, otherwise even hovering tooltip will make it appear
 		pointer-events: none;
 
 		@include vendor('transition', 0.3s ease);
-		@include vendor('transition-delay', $hideDelay);
+		@include vendor('transition-delay', $hintHideDelay);
 	}
 
 	&:hover:before, &:hover:after {
@@ -40,8 +40,8 @@
 	}
 
 	&:hover:before, &:hover:after {
-		// $showDelay will apply as soon as element is hovered.
-		@include vendor('transition-delay', $showDelay);
+		// $hintShowDelay will apply as soon as element is hovered.
+		@include vendor('transition-delay', $hintShowDelay);
 	}
 
 	/**
@@ -51,27 +51,38 @@
 		content: '';
 		position: absolute;
 		background: transparent;
-		border: $arrowBorderWidth solid transparent;
+		border: $hintArrowBorderWidth solid transparent;
 		// move z-index 1 up than :after so that it shows over box-shadow
-		z-index: $zIndex + 1;
+		z-index: $hintZIndex + 1;
 	}
 
 	/**
 	 * tooltip body
 	 */
 	&:after {
-		content: attr(data-hint); // The magic!
-		background: $defaultColor;
+		background: $hintDefaultColor;
 		color: white;
-		padding: $verticalPadding $horizontalPadding;
-		font-size: $fontSize;
-		line-height: $fontSize; // Vertical centering.
+		padding: $hintVerticalPadding $hintHorizontalPadding;
+		font-size: $hintFontSize;
+		font-family: $hintFontFamily;
+		line-height: $hintFontSize; // Vertical centering.
 		white-space: nowrap; // Prevent breaking to new line.
+	}
+	// Always get content from aria-label attribute.
+	&[aria-label]:after {
+		content: attr(aria-label); // The magic!
+	}
+	// If the `data-hint` attribute is present, use it.
+	// This might be deprecated in future in support of a11y.
+	&[data-hint]:after {
+		content: attr(data-hint); // The magic!
 	}
 }
 
+// Hide tooltips if any of the supported attributes is empty.
+[aria-label=''],
 [data-hint=''] {
 	&:before, &:after {
-		display: none!important;
+		display: none !important;
 	}
 }
