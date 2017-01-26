@@ -88,7 +88,7 @@ class GF_Tooltips_Admin
 		$screen = get_current_screen();
 
 		// Bail if we don't match up.
-		if ( ! is_object( $screen ) || empty( $screen->parent_file ) || $screen->parent_file !== 'plugins.php' ) {
+		if ( ! is_object( $screen ) || empty( $screen->parent_file ) || 'plugins.php' !== $screen->parent_file ) {
 			return;
 		}
 
@@ -199,7 +199,7 @@ class GF_Tooltips_Admin
 		echo '<li class="custom_tooltip_setting field_setting">';
 
 			// Set the label for the field.
-			echo '<label for="custom_tooltip">';
+			echo '<label class="section_label" for="custom_tooltip">';
 				echo __( 'Tooltip Content', 'gravity-tooltips' );
 				echo '&nbsp;' . gform_tooltip( 'custom_tooltip_tip', 'tooltip', true );
 			echo '</label>';
