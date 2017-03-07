@@ -137,6 +137,11 @@ class GF_Tooltips_Admin
 	 */
 	public function quick_link( $links, $file ) {
 
+		// Bail without caps.
+		if ( ! current_user_can( apply_filters( 'gf_tooltips_admin_cap', 'gravityforms_edit_settings' ) ) ) {
+			return $links;
+		}
+
 		// Set the static var.
 		static $this_plugin;
 
@@ -171,9 +176,10 @@ class GF_Tooltips_Admin
 
 		// Set up the item.
 		$menu_items[] = array(
-			'name'      => 'gf-tooltips',
-			'label'     => __( 'Tooltips', 'gravity-tooltips' ),
-			'callback'  => array( __class__, 'settings_page' )
+			'name'        => 'gf-tooltips',
+			'label'       => __( 'Tooltips', 'gravity-tooltips' ),
+			'permission'  => apply_filters( 'gf_tooltips_admin_cap', 'gravityforms_edit_settings' ),
+			'callback'    => array( __class__, 'settings_page' ),
 		);
 
 		// Return the items.
@@ -264,7 +270,7 @@ class GF_Tooltips_Admin
 	public static function settings_page() {
 
 		// Bail without caps.
-		if ( ! current_user_can( apply_filters( 'gf_tooltips_admin_cap', 'manage_options' ) ) ) {
+		if ( ! current_user_can( apply_filters( 'gf_tooltips_admin_cap', 'gravityforms_edit_settings' ) ) ) {
 			return;
 		}
 
@@ -494,7 +500,7 @@ class GF_Tooltips_Admin
 		return $field;
 	}
 
-// end class
+	// End class.
 }
 
 // end exists check
