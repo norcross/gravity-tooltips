@@ -1,3 +1,10 @@
+#### Version 2.0.4 - 2019/01/28
+* Update settings page capabilities to allow admins to view/edit. props @tannerm 
+
+#### Version 2.0.4 - 2017/03/07
+* updating submenu item creation to declare specific permissions
+* minor readme updates
+
 #### Version 2.0.3 - 2016/08/10
 * added setting to declare a set tooltip width
 * updated hint.css library to current version
