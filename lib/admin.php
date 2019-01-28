@@ -138,7 +138,7 @@ class GF_Tooltips_Admin
 	public function quick_link( $links, $file ) {
 
 		// Bail without caps.
-		if ( ! current_user_can( apply_filters( 'gf_tooltips_admin_cap', 'gravityforms_edit_settings' ) ) ) {
+		if ( ! GFCommon::current_user_can_any( apply_filters( 'gf_tooltips_admin_cap', 'gravityforms_edit_settings' ) ) ) {
 			return $links;
 		}
 
@@ -270,7 +270,7 @@ class GF_Tooltips_Admin
 	public static function settings_page() {
 
 		// Bail without caps.
-		if ( ! current_user_can( apply_filters( 'gf_tooltips_admin_cap', 'gravityforms_edit_settings' ) ) ) {
+		if ( ! GFCommon::current_user_can_any( apply_filters( 'gf_tooltips_admin_cap', 'gravityforms_edit_settings' ) ) ) {
 			return;
 		}
 
