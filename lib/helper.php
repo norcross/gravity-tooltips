@@ -125,7 +125,8 @@ class GF_Tooltips_Helper
 			'total',
 			'post_custom_field',
 			'password',
-			'section'
+			'section',
+			'consent',
 		);
 
 		// Return the types, filtered.
