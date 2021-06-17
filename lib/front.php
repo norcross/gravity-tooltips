@@ -136,12 +136,18 @@ class GF_Tooltips_Front
 	public static function render_tooltip_markup( $text = '', $type = '', $render = '', $field, $form_id ) {
 
 		// Grab our tooltip design, target, and size.
-		$design = GF_Tooltips_Helper::get_tooltip_data( 'design', 'light' );
-		$target = GF_Tooltips_Helper::get_tooltip_data( 'target', 'right' );
-		$size   = GF_Tooltips_Helper::get_tooltip_data( 'size', 'default' );
+		$design        = GF_Tooltips_Helper::get_tooltip_data( 'design', 'light' );
+		$target        = GF_Tooltips_Helper::get_tooltip_data( 'target', 'right' );
+		$size          = GF_Tooltips_Helper::get_tooltip_data( 'size', 'default' );
 
 		// Set a class.
-		$class  = self::get_tooltip_class( $design, $target, $type, $size );
+		$class         = self::get_tooltip_class( $design, $target, $type, $size );
+
+		// Boolean for Gravity Forms 2.5.0+
+		$gf_25_plus	   = version_compare( GFCommon::get_version_info()['version'], '2.5.0', '>=' );
+		
+		// Boolean for Gravity Forms 2.5.0+ legacy markup form setting
+		$legacy_markup = GFCommon::is_legacy_markup_enabled( GFAPI::get_form( $form_id ) );
 
 		// Build out label version.
 		if ( 'label' === $type ) {
@@ -149,8 +155,12 @@ class GF_Tooltips_Front
 			// Determine which label class to filter based on field type.
 			$lclass = 'section' === $field->type ? 'gsection_title' : 'gfield_label';
 
-			// Determine what to attach to, since sections get handled differently due to markup differences.
-			$attach = 'section' === $field->type ? '<h2' : '<label';
+			// Determine what to attach to, since fieldsets, sections and regular fields get handled differently due to markup differences.
+			if ( $gf_25_plus && !$legacy_markup ) {
+				$attach = in_array( $field->type, GF_Tooltips_Helper::fieldset_item_types() ) ? '<legend' : ( 'section' === $field->type ? '<h2' : '<label' );
+			} else {
+				$attach = 'section' === $field->type ? '<h2' : '<label';
+			}
 
 			// First add the class.
 			$render = GF_Tooltips_Helper::str_replace_limit( $lclass, $lclass . ' ' . $class, $render );
@@ -168,14 +178,18 @@ class GF_Tooltips_Front
 			// Build the markup.
 			$setup  = '<span class="gf-icon ' . $class . '" data-hint="' . esc_attr( $text ) . '">' . $icon . '</span>';
 
-			// Determine what to attach to, since sections get handled differently due to markup differences.
-			$attach = 'section' === $field->type ? '</h2>' : '</label>';
+			// Determine what to attach to, since fieldsets, sections and regular fields get handled differently due to markup differences.
+			if ( $gf_25_plus && !$legacy_markup ) {
+				$attach = in_array( $field->type, GF_Tooltips_Helper::fieldset_item_types() ) ? '</legend>' : ( 'section' === $field->type ? '</h2>' : '</label>' );
+			} else {
+				$attach = 'section' === $field->type ? '</h2>' : '</label>';
+			}
 
 			// And render it.
 			$render = GF_Tooltips_Helper::str_replace_limit( $attach, $setup . $attach, $render );
 		}
 
-		// Build out single version.
+		// Build out description-style below field version.
 		if ( 'single' === $type ) {
 
 			// Get my icon.
@@ -184,8 +198,13 @@ class GF_Tooltips_Front
 			// Build the markup.
 			$setup  = '<span class="gf-icon ' . $class . '" data-hint="' . esc_attr( $text ) . '">' . $icon . '</span>';
 
-			// Determine what to attach to, since sections get handled differently due to markup differences.
-			$attach = 'section' === $field->type ? '</h2>' : '</div>';
+			// Determine what to attach to, since fieldsets, sections and regular fields get handled differently due to markup differences.
+			if ( $gf_25_plus && !$legacy_markup ) {
+				$attach = in_array( $field->type, GF_Tooltips_Helper::fieldset_item_types() ) ? '</legend>' : ( 'section' === $field->type ? '</h2>' : '</div>' );
+			} else {
+				$attach = 'section' === $field->type ? '</h2>' : '</div>';
+			}
+			
 
 			// Render it.
 			$render = GF_Tooltips_Helper::str_replace_limit( $attach, $attach . $setup, $render );
