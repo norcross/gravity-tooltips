@@ -88,48 +88,80 @@ class GF_Tooltips_Helper
 
 		// Set the array of field types.
 		$fields = array(
-			'text',
-			'creditcard',
-			'website',
-			'phone',
-			'number',
-			'date',
-			'time',
-			'textarea',
-			'select',
-			'multiselect',
-			'checkbox',
-			'radio',
-			'name',
 			'address',
-			'fileupload',
-			'email',
-			'post_title',
-			'post_content',
-			'post_excerpt',
-			'post_tags',
-			'post_category',
-			'post_image',
-			'captcha',
-			'product',
-			'singleproduct',
 			'calculation',
-			'price',
+			'captcha',
+			'checkbox',
+			'consent',
+			'creditcard',
+			'date',
+			'donation',
+			'email',
+			'fieldset',
+			'fileupload',
 			'hiddenproduct',
 			'list',
-			'shipping',
-			'singleshipping',
+			'multiselect',
+			'name',
+			'number',
 			'option',
-			'quantity',
-			'donation',
-			'total',
-			'post_custom_field',
 			'password',
-			'section'
+			'phone',
+			'post_category',
+			'post_content',
+			'post_custom_field',
+			'post_excerpt',
+			'post_image',
+			'post_tags',
+			'post_title',
+			'price',
+			'product',
+			'quantity',
+			'radio',
+			'section',
+			'select',
+			'shipping',
+			'singleproduct',
+			'singleshipping',
+			'text',
+			'textarea',
+			'time',
+			'total',
+			'website'
 		);
 
 		// Return the types, filtered.
 		return apply_filters( 'gf_tooltips_allowed_fields', $fields );
+	}
+
+	/**
+	 * Set up all the possible fieldset constructed types.
+	 * Required for Gravity Forms 2.5.0+
+	 *
+	 * @return array $fields  All the field types.
+	 */
+	public static function fieldset_item_types() {
+
+		// Set the array of field types.
+		$fields = array(
+			'address',
+			'checkbox',
+			'consent',
+			'creditcard',
+			'date',
+			'email',
+			'fieldset',
+			'list',
+			'name',
+			'password',
+			'post_image',
+			'radio',
+			'repeater',
+			'time'
+		);
+
+		// Return the types, filtered.
+		return apply_filters( 'gf_tooltips_fieldset_fields', $fields );
 	}
 
 	// End our class.
