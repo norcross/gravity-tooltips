@@ -1,8 +1,13 @@
-#### Version 2.0.4 - 2019/01/28
-* Update settings page capabilities to allow admins to view/edit. props @tannerm 
+#### Version 2.1.0 - 2021/06/16
+* added support for markup changes in Gravity Forms 2.5.0+
+* added consent, fieldset, and repeater fields to field types
+* added complex field types that generate fieldset fields in new GF 2.5.0+ markup
+
+#### Version 2.0.5 - 2019/01/28
+* updated settings page capabilities to allow admins to view/edit. props @tannerm 
 
 #### Version 2.0.4 - 2017/03/07
-* updating submenu item creation to declare specific permissions
+* updated submenu item creation to declare specific permissions
 * minor readme updates
 
 #### Version 2.0.3 - 2016/08/10
