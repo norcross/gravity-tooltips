@@ -23,7 +23,7 @@
 .hint--base:after {
 	font-size: 14px;
 	line-height: 20px;
-	white-space: pre;
+	// white-space: pre;
 }
 
 .hint--has-size:after {
@@ -99,7 +99,7 @@ span.gf-icon {
 	display: inline-block;
 	vertical-align: middle;
 	margin: 0;
-	padding: 0 0.375em;
+	padding: 0 0 0 0.375em;
 }
 
 span.gf-icon .fa {
