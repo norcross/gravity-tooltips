@@ -134,6 +134,36 @@ class GF_Tooltips_Helper
 		return apply_filters( 'gf_tooltips_allowed_fields', $fields );
 	}
 
+	/**
+	 * Set up all the possible fieldset constructed types.
+	 * Required for Gravity Forms 2.5.0+
+	 *
+	 * @return array $fields  All the field types.
+	 */
+	public static function fieldset_item_types() {
+
+		// Set the array of field types.
+		$fields = array(
+			'address',
+			'checkbox',
+			'consent',
+			'creditcard',
+			'date',
+			'email',
+			'fieldset',
+			'list',
+			'name',
+			'password',
+			'post_image',
+			'radio',
+			'repeater',
+			'time'
+		);
+
+		// Return the types, filtered.
+		return apply_filters( 'gf_tooltips_fieldset_fields', $fields );
+	}
+
 	// End our class.
 }
 
